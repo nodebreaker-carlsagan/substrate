@@ -134,7 +134,7 @@ type TLightCallExecutor<TBl, TExecDisp> = client::light::call_executor::GenesisC
 >;
 
 impl<TCfg, TGen, TCSExt> ServiceBuilder<(), (), TCfg, TGen, TCSExt, (), (), (), (), (), (), (), (), (), (), ()>
-where TGen: RuntimeGenesis, TCSExt: Extension {
+where TCfg: Default, TGen: RuntimeGenesis, TCSExt: Extension {
 	/// Start the service builder with a configuration.
 	pub fn new_full<TBl: BlockT<Hash=H256>, TRtApi, TExecDisp: NativeExecutionDispatch>(
 		config: Configuration<TCfg, TGen, TCSExt>
@@ -163,7 +163,7 @@ where TGen: RuntimeGenesis, TCSExt: Extension {
 			state_cache_size: config.state_cache_size,
 			state_cache_child_ratio:
 				config.state_cache_child_ratio.map(|v| (v, 100)),
-			path: config.database_path.clone(),
+			path: config.database_path(),
 			pruning: config.pruning.clone(),
 		};
 
@@ -238,7 +238,7 @@ where TGen: RuntimeGenesis, TCSExt: Extension {
 			state_cache_size: config.state_cache_size,
 			state_cache_child_ratio:
 				config.state_cache_child_ratio.map(|v| (v, 100)),
-			path: config.database_path.clone(),
+			path: config.database_path(),
 			pruning: config.pruning.clone(),
 		};
 

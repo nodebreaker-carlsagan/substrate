@@ -43,10 +43,10 @@ pub struct Configuration<C, G, E = NoExtension> {
 	pub transaction_pool: transaction_pool::txpool::Options,
 	/// Network configuration.
 	pub network: NetworkConfiguration,
+	/// Path to the base configuration directory.
+	pub config_dir: PathBuf,
 	/// Path to key files.
 	pub keystore_path: PathBuf,
-	/// Path to the database.
-	pub database_path: PathBuf,
 	/// Cache Size for internal database in MiB
 	pub database_cache_size: Option<u32>,
 	/// Size of internal state cache in Bytes
@@ -103,17 +103,22 @@ impl<C, G, E> Configuration<C, G, E> where
 {
 	/// Create default config for given chain spec.
 	pub fn default_with_spec(chain_spec: ChainSpec<G, E>) -> Self {
+		Self::default_with_spec_and_base_path(chain_spec, Default::default())
+	}
+	
+	/// Create a default config for given chain spec and path to configuration dir
+	pub fn default_with_spec_and_base_path(chain_spec: ChainSpec<G, E>, config_dir: PathBuf) -> Self {
 		let mut configuration = Configuration {
 			impl_name: "parity-substrate",
 			impl_version: "0.0.0",
 			impl_commit: "",
 			chain_spec,
+			config_dir,
 			name: Default::default(),
 			roles: Roles::FULL,
 			transaction_pool: Default::default(),
 			network: Default::default(),
 			keystore_path: Default::default(),
-			database_path: Default::default(),
 			database_cache_size: Default::default(),
 			state_cache_size: Default::default(),
 			state_cache_child_ratio: Default::default(),
@@ -141,6 +146,10 @@ impl<C, G, E> Configuration<C, G, E> where
 		configuration
 	}
 
+}
+
+impl<C, G, E> Configuration<C, G, E> {
+
 	/// Returns full version string of this configuration.
 	pub fn full_version(&self) -> String {
 		full_version_from_strs(self.impl_version, self.impl_commit)
@@ -149,6 +158,25 @@ impl<C, G, E> Configuration<C, G, E> where
 	/// Implementation id and version.
 	pub fn client_id(&self) -> String {
 		format!("{}/v{}", self.impl_name, self.full_version())
+	}
+
+	/// Generate a PathBuf to sub in the chain configuration directory
+	pub fn in_chain_config_dir(&self, sub: &str) -> PathBuf {
+		let mut path = self.config_dir.clone();
+		path.push("chains");
+		path.push(self.chain_spec.id());
+		path.push(sub);
+		path
+	}
+	
+	/// The basepath for the db directory
+	pub fn database_path(&self) -> PathBuf {
+		self.in_chain_config_dir("db")
+	}
+
+	/// The basepath for the network file
+	pub fn network_path(&self) -> PathBuf {
+		self.in_chain_config_dir("network")
 	}
 }
 
