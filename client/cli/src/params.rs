@@ -386,6 +386,11 @@ pub struct RunCmd {
 	#[structopt(long = "ws-external")]
 	pub ws_external: bool,
 
+	#[structopt(long = "prometheus-port", value_name = "PORT")]
+	pub prometheus_port: Option<u16>,
+	#[structopt(long = "prometheus-addr", value_name = "Local IP address")]
+	pub prometheus_endpoint: Option<String>,
+	
 	/// Specify HTTP RPC server TCP port.
 	#[structopt(long = "rpc-port", value_name = "PORT")]
 	pub rpc_port: Option<u16>,

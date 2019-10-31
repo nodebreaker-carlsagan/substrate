@@ -46,7 +46,7 @@ use sr_primitives::traits::{
 	Block as BlockT, Header as HeaderT, NumberFor, One, Zero,SaturatedConversion,
 };
 use substrate_telemetry::{telemetry, CONSENSUS_INFO};
-
+use substrate_prometheus::{metrics};
 use crate::{
 	CommandOrError, Commit, Config, Error, Network, Precommit, Prevote,
 	PrimaryPropose, SignedMessage, NewAuthoritySet, VoterCommand,
@@ -1006,7 +1006,7 @@ pub(crate) fn finalize_block<B, Block: BlockT<Hash=H256>, E, RA>(
 		telemetry!(CONSENSUS_INFO; "afg.finalized_blocks_up_to";
 			"number" => ?number, "hash" => ?hash,
 		);
-		
+		metrics::set_gauge(&metrics::FINALITY_HEIGHT, number.saturated_into::<u64>());
 		let new_authorities = if let Some((canon_hash, canon_number)) = status.new_set_block {
 			// the authority set has changed.
 			let (new_id, set_ref) = authority_set.current();

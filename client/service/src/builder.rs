@@ -1133,7 +1133,10 @@ ServiceBuilder<
 				.then(|_| Ok(()))));
 			telemetry
 		});
-		
+		match config.prometheus_endpoint {
+			None => (), 
+			Some(x) => {let _prometheus = promet::init_prometheus(x);}	
+		}
 		Ok(Service {
 			client,
 			network,

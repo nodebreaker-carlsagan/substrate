@@ -73,6 +73,8 @@ pub struct Configuration<C, G, E = NoExtension> {
 	pub rpc_ws_max_connections: Option<usize>,
 	/// CORS settings for HTTP & WS servers. `None` if all origins are allowed.
 	pub rpc_cors: Option<Vec<String>>,
+	/// prometheus service addr. `None` if disabled.
+	pub prometheus_endpoint: Option<SocketAddr>,
 	/// Telemetry service URL. `None` if disabled.
 	pub telemetry_endpoints: Option<TelemetryEndpoints>,
 	/// External WASM transport for the telemetry. If `Some`, when connection to a telemetry
@@ -147,6 +149,7 @@ impl<C, G, E> Configuration<C, G, E> where
 			rpc_ws: None,
 			rpc_ws_max_connections: None,
 			rpc_cors: Some(vec![]),
+			prometheus_endpoint: None,
 			telemetry_endpoints: None,
 			telemetry_external_transport: None,
 			default_heap_pages: None,

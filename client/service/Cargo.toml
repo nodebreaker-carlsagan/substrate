@@ -48,6 +48,7 @@ transaction_pool = { package = "substrate-transaction-pool", path = "../transact
 rpc-servers = { package = "substrate-rpc-servers", path = "../rpc-servers" }
 rpc = { package = "substrate-rpc", path = "../rpc" }
 tel = { package = "substrate-telemetry", path = "../telemetry" }
+promet = { package = "substrate-prometheus", path="../prometheus"}
 offchain = { package = "substrate-offchain", path = "../offchain" }
 parity-multiaddr = { package = "parity-multiaddr", version = "0.5.0" }
 
