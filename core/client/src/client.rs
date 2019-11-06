@@ -1170,7 +1170,7 @@ impl<B, E, Block, RA> Client<B, E, Block, RA> where
 				"height" => format!("{}", header.number()),
 				"best" => ?finalized_hash,
 			);
-
+			
 			let notification = FinalityNotification {
 				header,
 				hash: finalized_hash,

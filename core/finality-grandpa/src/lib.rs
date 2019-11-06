@@ -52,8 +52,6 @@
 //! or prune any signaled changes based on whether the signaling block is
 //! included in the newly-finalized chain.
 
-#[macro_use]
-extern crate lazy_static;
 use futures::prelude::*;
 use log::{debug, error, info};
 use futures::sync::mpsc;
@@ -95,7 +93,6 @@ mod light_import;
 mod observer;
 mod until_imported;
 mod voting_rule;
-mod metrics;
 
 pub use communication::Network;
 pub use finality_proof::FinalityProofProvider;
