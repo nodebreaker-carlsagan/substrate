@@ -31,6 +31,7 @@ use primitives::{
 	offchain::{OffchainExt, self}, traits::CodeExecutor,
 };
 use substrate_telemetry::{telemetry, SUBSTRATE_INFO};
+use substrate_prometheus::{metrics};
 use sr_primitives::{
 	Justification, BuildStorage,
 	generic::{BlockId, SignedBlock, DigestItem},
@@ -893,6 +894,7 @@ impl<B, E, Block, RA> Client<B, E, Block, RA> where
 					"best" => ?hash,
 					"origin" => ?origin
 				);
+				metrics::set_gauge(&metrics::BEST_HEIGHT, height as u64);
 			}
 		}
 

@@ -11,7 +11,6 @@ lazy_static = "1.0"
 log = "0.4"
 prometheus = { version = "0.7", features = ["nightly", "process"]}
 tokio = "0.1"
-sr-primitives = { path = "../sr-primitives" }
 
 [dev-dependencies]
 reqwest = "0.9"
