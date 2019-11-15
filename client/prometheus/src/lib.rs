@@ -10,7 +10,7 @@ use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
 use prometheus::{Counter, Encoder, Gauge, HistogramVec, TextEncoder,register_counter};
 use std::{net::{ SocketAddr}};
-use prometheus::{HistogramOpts, HistogramTimer, Opts};
+use prometheus::{ Opts};
 pub use sr_primitives::traits::SaturatedConversion;
 
 pub use prometheus::{Histogram, IntCounter, IntGauge, Result};

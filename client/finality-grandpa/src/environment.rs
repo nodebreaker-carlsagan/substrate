@@ -48,11 +48,7 @@ use sr_primitives::traits::{
 	Block as BlockT, Header as HeaderT, NumberFor, One, Zero,
 };
 use substrate_telemetry::{telemetry, CONSENSUS_INFO};
-<<<<<<< HEAD:client/finality-grandpa/src/environment.rs
-use substrate_prometheus::{metrics};
-=======
 //use crate::metrics; // for local metrics
->>>>>>> set global/local metric:core/finality-grandpa/src/environment.rs
 use crate::{
 	CommandOrError, Commit, Config, Error, Network, Precommit, Prevote,
 	PrimaryPropose, SignedMessage, NewAuthoritySet, VoterCommand,
