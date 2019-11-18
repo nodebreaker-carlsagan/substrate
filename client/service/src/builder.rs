@@ -997,6 +997,8 @@ ServiceBuilder<
 				"used_state_cache_size" => used_state_cache_size,
 			);
 			metrics::set_gauge(&metrics::PEERS_NUM, num_peers as u64);
+			metrics::set_gauge(&metrics::BEST_HEIGHT, best_number as u64);
+			metrics::set_gauge(&metrics::FINALITY_HEIGHT, finalized_number as u64);
 			Ok(())
 		}).select(exit.clone()).then(|_| Ok(()));
 		let _ = to_spawn_tx.unbounded_send(Box::new(tel_task));
