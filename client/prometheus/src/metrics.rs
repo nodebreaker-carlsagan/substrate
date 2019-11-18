@@ -22,4 +22,8 @@ lazy_static! {
         "best_block_height_number",
         "block is best HEIGHT"
     );
+    pub static ref PEERS_NUM: Result<IntGauge> = try_create_int_gauge(
+        "peers_number",
+        "network gosip peers number"
+    );
 }

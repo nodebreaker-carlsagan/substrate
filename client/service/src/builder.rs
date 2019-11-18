@@ -52,6 +52,7 @@ use std::{
 };
 use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use tel::{telemetry, SUBSTRATE_INFO};
+use promet::{metrics};
 use transaction_pool::txpool::{self, ChainApi, Pool as TransactionPool};
 
 /// Aggregator for the components required to build a service.
@@ -995,7 +996,7 @@ ServiceBuilder<
 				"bandwidth_upload" => bandwidth_upload,
 				"used_state_cache_size" => used_state_cache_size,
 			);
-
+			metrics::set_gauge(&metrics::PEERS_NUM, num_peers as u64);
 			Ok(())
 		}).select(exit.clone()).then(|_| Ok(()));
 		let _ = to_spawn_tx.unbounded_send(Box::new(tel_task));
