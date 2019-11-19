@@ -129,10 +129,11 @@ match config.prometheus_endpoint {
 ```
 substrate/Cargo.toml
 ```toml
+        ....
 [workspace]
 members = [
 	"client/prometheus",
-....
+        ....
 ```
 
 ### List of available metrics
@@ -142,10 +143,10 @@ Consensus metrics, namespace: `substrate`
 
 | **Name**                                | **Type**  | **Tags** | **Description**                                                 |
 |-----------------------------------------|-----------|----------|-----------------------------------------------------------------|
-| consensus_height                        | Gauge     |          | Height of the chain                                             |
-| consensus_failure                       | counter   | height   | Consensus failure                                               |
-| consensus_validators                    | Gauge     |          | Number of validators                                            |
-| consensus_validators_power              | Gauge     |          | Total voting power of all validators                            |
+| consensus_FINALITY_HEIGHT               | IntGauge  |          | finality Height of the chain                                    |
+| consensus_BEST_HEIGHT                   | IntGauge  | height   | best Height of the chain                                        |
+| consensus_TARGET_HEIGHT                 | IntGauge  |          | syning Height target number                                     |
+| consensus_validators_power              | IntGauge  |          | Total voting power of all validators                            |
 | consensus_missing_validators            | Gauge     |          | Number of validators who did not sign                           |
 | consensus_missing_validators_power      | Gauge     |          | Total voting power of the missing validators                    |
 | consensus_byzantine_validators          | Gauge     |          | Number of validators who tried to double sign                   |
@@ -153,27 +154,34 @@ Consensus metrics, namespace: `substrate`
 | consensus_block_interval_seconds        | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
 | consensus_rounds                        | Gauge     |          | Number of rounds                                                |
 | consensus_num_txs                       | Gauge     |          | Number of transactions                                          |
-| consensus_block_parts                   | counter   | peer_id | number of blockparts transmitted by peer                        |
-| consensus_latest_block_height           | gauge     |          | /status sync_info number                                       |
+| consensus_block_parts                   | counter   | peer_id  | number of blockparts transmitted by peer                        |
+| consensus_latest_block_height           | gauge     |          | /status sync_info number                                        |
 | consensus_fast_syncing                  | gauge     |          | either 0 (not fast syncing) or 1 (syncing)                      |
 | consensus_total_txs                     | Gauge     |          | Total number of transactions committed                          |
 | consensus_block_size_bytes              | Gauge     |          | Block size in bytes                                             |
-| p2p_peers                               | Gauge     |          | Number of peers node's connected to                             |
-| p2p_peer_receive_bytes_total            | counter   | peer_id | number of bytes received from a given peer                      |
-| p2p_peer_send_bytes_total               | counter   | peer_id | number of bytes sent to a given peer                            |
-| p2p_peer_pending_send_bytes             | gauge     | peer_id | number of pending bytes to be sent to a given peer              |
-| p2p_num_txs                             | gauge     | peer_id | number of transactions submitted by each peer_id               |
+| p2p_peers                               | IntGauge  |          | Number of peers node's connected to                             |
+| p2p_peer_receive_bytes_total            | counter   | peer_id  | number of bytes received from a given peer                      |
+| p2p_peer_send_bytes_total               | counter   | peer_id  | number of bytes sent to a given peer                            |
+| p2p_peer_pending_send_bytes             | gauge     | peer_id  | number of pending bytes to be sent to a given peer              |
+| p2p_num_txs                             | gauge     | peer_id  | number of transactions submitted by each peer_id                |
 | mempool_size                            | Gauge     |          | Number of uncommitted transactions                              |
 | mempool_tx_size_bytes                   | histogram |          | transaction sizes in bytes                                      |
 | mempool_failed_txs                      | counter   |          | number of failed transactions                                   |
 | mempool_recheck_times                   | counter   |          | number of transactions rechecked in the mempool                 |
 | state_block_processing_time             | histogram |          | time between BeginBlock and EndBlock in ms                      |
-| state_recheck_time                      | histogram |          | time cost on recheck in ms                      |
-| state_app_hash_conflict                 | count     | proposer, height | App hash conflict error                      |
+| state_recheck_time                      | histogram |          | time cost on recheck in ms                                      |
+| state_app_hash_conflict                 | count     | proposer, height | App hash conflict error                                 |
 
 
 
 ## Start Prometheus
+### Install prometheus
+
+https://prometheus.io/download/
+```bash
+wget <download URL>
+tar -zxvf <prometheus tar file>
+```
 
 ### Edit Prometheus config file
 
@@ -194,19 +202,34 @@ Then edit `prometheus.yml` and add `jobs` :
 ### Start Prometheus
 
 ```bash
-docker run -d --name=prometheus -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus
+cd <prometheus file>
+./prometheus
 ```
 
 > The above example, you can save `prometheus.yml` at `~/volumes/prometheus` on your host machine
 
 You can visit `http://localhost:9090` to see prometheus data.
 
-## Start Grafana
 
-```
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+## Start Grafana
+### Install Grafana
+https://grafana.com/docs/installation/debian/
+
+```bash
+apt-get install -y software-properties-common
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install grafana
+sudo service grafana-server start
+./prometheus
 ```
 
 You can visit `http://localhost:3000/` to open grafana and create your own dashboard.
 
 > Tips: The default username and password are both admin. We strongly recommend immediately changing your username & password after login
+
+### Seting Grafana
+
+Default ID:PW is admin.
