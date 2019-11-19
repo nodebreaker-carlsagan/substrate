@@ -26,4 +26,8 @@ lazy_static! {
         "peers_number",
         "network gosip peers number"
     );
+    pub static ref TARGET_NUM: Result<IntGauge> = try_create_int_gauge(
+        "target_syn_number",
+        "block syn target number"
+    );
 }
