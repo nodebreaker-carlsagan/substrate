@@ -17,11 +17,7 @@ pub mod metrics;
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
 pub fn init_prometheus(prometheus_addr: SocketAddr) {
-    //let addr = &std::net::SocketAddr::V4;
-    //let addr = ([127, 0, 0, 1], 9898).into();
     let addr = prometheus_addr;
-    //let parsed_addr = addr.parse().unwrap();
-    //prometheus::register_int_counter!("meh", "foo");
     let server = Server::bind(&addr)
         .serve(|| {
             // This is the `Service` that will handle the connection.
