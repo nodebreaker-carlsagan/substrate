@@ -18,10 +18,10 @@ use ansi_term::Colour;
 use client_api::ClientInfo;
 use log::info;
 use network::SyncState;
-use sr_primitives::traits::{Block as BlockT, CheckedDiv, NumberFor, Zero, Saturating};
+use sr_primitives::traits::{Block as BlockT, CheckedDiv, NumberFor, Zero, Saturating,SaturatedConversion};
 use service::NetworkStatus;
 use std::{convert::{TryFrom, TryInto}, fmt, time};
-
+use substrate_prometheus::{metrics};
 /// State of the informant display system.
 ///
 /// This is the system that handles the line that gets regularly printed and that looks something
@@ -63,9 +63,8 @@ impl<B: BlockT> InformantDisplay<B> {
 		let (status, target) = match (net_status.sync_state, net_status.best_seen_block) {
 			(SyncState::Idle, _) => ("Idle".into(), "".into()),
 			(SyncState::Downloading, None) => (format!("Syncing{}", speed), "".into()),
-			(SyncState::Downloading, Some(n)) => (format!("Syncing{}", speed), format!(", target=#{}", n)),
-		};
-
+			(SyncState::Downloading, Some(n)) => { metrics::set_gauge(&metrics::TARGET_NUM, n.saturated_into().try_into().unwrap()); (format!("Syncing{}", speed), format!(", target=#{}", n))},
+		  };
 		info!(
 			target: "substrate",
 			"{}{} ({} peers), best: #{} ({}), finalized #{} ({}), ⬇ {} ⬆ {}",

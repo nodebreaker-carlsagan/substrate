@@ -558,7 +558,7 @@ fn incoming_global<B: BlockT, N: Network<B>>(
 			"target_number" => ?msg.message.target_number.clone(),
 			"target_hash" => ?msg.message.target_hash.clone(),
 		);
-
+		
 		if let Err(cost) = check_compact_commit::<B>(
 			&msg.message,
 			voters,
