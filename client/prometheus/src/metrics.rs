@@ -17,6 +17,7 @@ lazy_static! {
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "finality_block_height_number",
         "block is finality HEIGHT"
+
     );
     pub static ref BEST_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "best_block_height_number",
