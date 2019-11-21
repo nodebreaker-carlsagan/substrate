@@ -137,26 +137,8 @@ members = [
 
 ### List of available metrics
 
-Application metrics, namespace: `substrate`
 
-| **Name** | **Type** | **Tags** | **Description** |
-| ---- | ---- | ---- | ----------- |
-| module_stake_bonded_token | Gauge | validator_address | Total bonded token by validator |
-| module_stake_loosen_token | Gauge |                   | Total loose tokens |
-| module_stake_burned_token | Gauge |                   | Total burned token |
-| module_stake_slashed_token | Counter | validator_address | Total slashed token by validator |
-| module_stake_jailed        | Gauge | validator_address | Jailed status by validator, either 0 (not jailed) or 1 (jailed) |
-| module_stake_power         | Gauge | validator_address | Voting power by validator |
-| module_upgrade_upgrade  | Gauge |  | Whether new software needs to be installed, either 0 (no) or 1 (yes) |
-| module_upgrade_signal  | Gauge | validator_address, version | Whether validator have run the new version software, either 0 (no) or 1 (yes)|
-| module_service_active_requests  | Gauge |  | Number of active requests |
-| module_gov_parameter  | Gauge |  parameter_key | Parameter of governance |
-| module_gov_proposal_status  | Gauge |  proposal_id | Status of proposal, 0:DepositPeriod 1:VotingPeriod 2:Pass 3:Reject 4:Other |
-| module_gov_vote  | Gauge |  proposal_id, validator_address | Validator vote result of a proposal, 0:Yes 1:No 2:NoWithVeto 3:Abstain |
-| module_distribution_community_tax  | Gauge |  height | Community tax accumulation |
-| v0_invariant_failure  | counter |  error | Invariant failure stats |
-
-Consensus metrics, namespace: `tendermint`
+Consensus metrics, namespace: `substrate`
 
 | **Name**                                | **Type**  | **Tags** | **Description**                                                 |
 |-----------------------------------------|-----------|----------|-----------------------------------------------------------------|
@@ -189,7 +171,7 @@ Consensus metrics, namespace: `tendermint`
 | state_recheck_time                      | histogram |          | time cost on recheck in ms                      |
 | state_app_hash_conflict                 | count     | proposer, height | App hash conflict error                      |
 
-IRISnet metrics also contains tendermint metrics, Visit [tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md) for more information.
+
 
 ## Start Prometheus
 
@@ -200,14 +182,14 @@ You can visit [prometheus.yml](https://github.com/prometheus/prometheus/blob/mas
 Then edit `prometheus.yml` and add `jobs` :
 
 ```yaml
-      - job_name: ku
+      - job_name: kusama
           static_configs:
-          - targets: ['localhost:36660']
+          - targets: ['localhost:33333']
             labels:
-              instance: fuxi
+              instance: local-validator
 ```
 
-> Note：value of targets is ip:port which used by IRIS monitor 
+> Note：value of targets is ip:port which used by substrate monitor 
 
 ### Start Prometheus
 
