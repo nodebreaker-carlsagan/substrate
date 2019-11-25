@@ -159,9 +159,9 @@ Consensus metrics, namespace: `substrate`
 | consensus_fast_syncing                  | gauge     |          | either 0 (not fast syncing) or 1 (syncing)                      |
 | consensus_total_txs                     | Gauge     |          | Total number of transactions committed                          |
 | consensus_block_size_bytes              | Gauge     |          | Block size in bytes                                             |
-| p2p_peers                               | IntGauge  |          | Number of peers node's connected to                             |
-| p2p_peer_receive_bytes_total            | counter   | peer_id  | number of bytes received from a given peer                      |
-| p2p_peer_send_bytes_total               | counter   | peer_id  | number of bytes sent to a given peer                            |
+| p2p_peers_number                               | IntGauge  |          | Number of peers node's connected to                             |
+| p2p_peer_receive_bytes_total            | IntGauge   | peer_id  | number of bytes received from a given peer                      |
+| p2p_peer_send_bytes_total               | IntGauge   | peer_id  | number of bytes sent to a given peer                            |
 | p2p_peer_pending_send_bytes             | gauge     | peer_id  | number of pending bytes to be sent to a given peer              |
 | p2p_num_txs                             | gauge     | peer_id  | number of transactions submitted by each peer_id                |
 | mempool_size                            | Gauge     |          | Number of uncommitted transactions                              |
