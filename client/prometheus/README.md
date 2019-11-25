@@ -136,7 +136,85 @@ members = [
         ....
 ```
 
-### List of available metrics
+### metrics add
+ex) consensus_FINALITY_HEIGHT
+
+client/prometheus/src/metrics.rs
+
+```rust
+pub use crate::*;
+
+pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
+    let opts = Opts::new(name, help);
+    let gauge = IntGauge::with_opts(opts)?;
+    prometheus::register(Box::new(gauge.clone()))?;
+    Ok(gauge)
+}
+
+pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
+    if let Ok(gauge) = gauge {
+        gauge.set(value as i64);
+    }
+}
+
+lazy_static! {
+    pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
+        "consensus_finality_block_height_number",
+        "block is finality HEIGHT"
+
+    );
+}
+```
+client/service/src/builder.rs
+```rust
+.....
+use promet::{metrics};
+.....
+		let tel_task = state_rx.for_each(move |(net_status, _)| {
+			let info = client_.info();
+			let best_number = info.chain.best_number.saturated_into::<u64>();
+			let best_hash = info.chain.best_hash;
+			let num_peers = net_status.num_connected_peers;
+			let txpool_status = transaction_pool_.status();
+			let finalized_number: u64 = info.chain.finalized_number.saturated_into::<u64>();
+			let bandwidth_download = net_status.average_download_per_sec;
+			let bandwidth_upload = net_status.average_upload_per_sec;
+
+			let used_state_cache_size = match info.used_state_cache_size {
+				Some(size) => size,
+				None => 0,
+			};
+
+			// get cpu usage and memory usage of this process
+			let (cpu_usage, memory) = if let Some(self_pid) = self_pid {
+				if sys.refresh_process(self_pid) {
+					let proc = sys.get_process(self_pid)
+						.expect("Above refresh_process succeeds, this should be Some(), qed");
+					(proc.cpu_usage(), proc.memory())
+				} else { (0.0, 0) }
+			} else { (0.0, 0) };
+
+			telemetry!(
+				SUBSTRATE_INFO;
+				"system.interval";
+				"peers" => num_peers,
+				"height" => best_number,
+				"best" => ?best_hash,
+				"txcount" => txpool_status.ready,
+				"cpu" => cpu_usage,
+				"memory" => memory,
+				"finalized_height" => finalized_number,
+				"finalized_hash" => ?info.chain.finalized_hash,
+				"bandwidth_download" => bandwidth_download,
+				"bandwidth_upload" => bandwidth_upload,
+				"used_state_cache_size" => used_state_cache_size,
+			);
+            metrics::set_gauge(&metrics::FINALITY_HEIGHT, finalized_number as u64);
+.....
+```
+
+
+## List of available metrics
 
 
 Consensus metrics, namespace: `substrate`
