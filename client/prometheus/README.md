@@ -137,6 +137,61 @@ members = [
 	"client/prometheus",
         ....
 ```
+### CLI Config
+client/cli/src/lib.rs
+```rust
+fn crate_run_node_config
+...
+}
+
+	match cli.prometheus_endpoint {
+		None => {config.prometheus_endpoint = None;},
+		Some(x) => {
+			config.prometheus_endpoint = Some(parse_address(&format!("{}:{}", x, 33333), cli.prometheus_port)?);
+			}
+	}
+...
+```
+
+client/cli/src/params.rs
+```rust
+pub struct RunCmd{
+/// Specify HTTP RPC server TCP port.
+#[structopt(long = "prometheus-port", value_name = "PORT")]
+	pub prometheus_port: Option<u16>,
+#[structopt(long = "prometheus-addr", value_name = "Local IP address")]
+	pub prometheus_endpoint: Option<String>,
+}
+```
+client/service/src/config.rs
+```rust
+#[derive(Clone)]
+pub struct Configuration<C, G, E = NoExtension> {
+    ...
+    pub prometheus_endpoint: Option<SocketAddr>,
+    ...
+}
+impl<C, G, E> Configuration<C, G, E> where
+	C: Default,
+	G: RuntimeGenesis,
+	E: Extension,
+{
+	/// Create default config for given chain spec.
+	pub fn default_with_spec(chain_spec: ChainSpec<G, E>) -> Self {
+		let mut configuration = Configuration {
+            ...
+            prometheus_endpoints: None,
+            ...
+		};
+		configuration.network.boot_nodes = configuration.chain_spec.boot_nodes().to_vec();
+
+		configuration.telemetry_endpoints = configuration.chain_spec.telemetry_endpoints().clone();
+
+		configuration
+	}
+```
+
+
 
 ### Metrics Add 
 ex) consensus_FINALITY_HEIGHT
