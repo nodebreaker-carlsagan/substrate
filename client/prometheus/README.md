@@ -12,7 +12,8 @@ Substrate Dev hack
  - CLI Config
  - Metrics Add
 
-List of available metrics
+Metrics
+ - List of available metrics
 
 Start Prometheus
  - Install prometheus
@@ -21,15 +22,6 @@ Start Prometheus
 
 Start Grafana
  - Install Grafana
-
-## Metrics
-
-substrate can report and serve the Prometheus metrics, which in their turn can be consumed by Prometheus collector(s).
-
-This functionality is disabled by default.
-
-To enable the Prometheus metrics, set in your cli command (--prometheus-addr,--prometheus-port ). 
-Metrics will be served under /metrics on 33333 port by default.
 
 ## Substrate Dev hack
 ### Prometheus starter
@@ -292,9 +284,16 @@ use promet::{metrics};
             metrics::set_gauge(&metrics::FINALITY_HEIGHT, finalized_number as u64);
 .....
 ```
+## Metrics
 
+substrate can report and serve the Prometheus metrics, which in their turn can be consumed by Prometheus collector(s).
 
-## List of available metrics
+This functionality is disabled by default.
+
+To enable the Prometheus metrics, set in your cli command (--prometheus-addr,--prometheus-port ). 
+Metrics will be served under /metrics on 33333 port by default.
+
+### List of available metrics
 
 
 Consensus metrics, namespace: `substrate`
