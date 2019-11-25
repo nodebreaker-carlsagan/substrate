@@ -1,9 +1,22 @@
-#substrate Monitor tool prometheus
+# Substrate Monitor tool Prometheus
 
 ## 소개
 
 프로메테우스는, 다른 체인의 생태계에서 매우 유용하게 사용되고있다. 코어에 포함 되게 되면 좀 더 세밀한 metrics 구현이 가능하다. 여러가지 기능들이
 있는데, 주로 노드헬스, 체인헬스에 대한 타임라인관리, 실시간알람, 그리고 그라파나를 이용한 시각화를 통해 노드를 철저하게 관리 할 수있다.
+
+## 목차
+Substrate Dev hack
+ - Prometheus starter
+ - CLI Config
+ - Metrics Add
+List of available metrics
+Start Prometheus
+ - Install prometheus
+ - Edit Prometheus config file
+ - Start Prometheus
+Start Grafana
+ - Install Grafana
 
 ## Metrics
 
