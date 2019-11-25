@@ -1,11 +1,10 @@
 # Substrate Monitor tool Prometheus
 
-## 소개
+## Introduction
 
-프로메테우스는, 다른 체인의 생태계에서 매우 유용하게 사용되고있다. 코어에 포함 되게 되면 좀 더 세밀한 metrics 구현이 가능하다. 여러가지 기능들이
-있는데, 주로 노드헬스, 체인헬스에 대한 타임라인관리, 실시간알람, 그리고 그라파나를 이용한 시각화를 통해 노드를 철저하게 관리 할 수있다.
+Prometheus is one of the most widely used monitoring tool for managing high availability services. By providing Prometheus service in substrate, node operators can easily adopt widely used display/alert tool such as Grafana without seting-up/operating external Prometheus agent. Easy access to such monitoring tools will benefit node operators to have much higher availability quality of their services.
 
-## 목차
+## List of Contents
 
 Substrate Dev hack
  - Prometheus starter
