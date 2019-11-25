@@ -19,6 +19,7 @@ Metrics will be served under /metrics on 33333 port by default.
 
 client/prometheus/src/lib.rs
 ```rust
+
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -56,12 +57,12 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
                         .status(StatusCode::OK)
                         .header("Content-Type", encoder.format_type())
                         .body(Body::from(buffer))
-                        .expect("Error constructing response")
+                        .expect("Sends OK(200) response with one or more data metrics")
                 } else {
                     Response::builder()
                         .status(StatusCode::NOT_FOUND)
                         .body(Body::from("Not found."))
-                        .expect("Error constructing response")
+                        .expect("Sends NOT_FOUND(404) message with no data metric")
                 }
             })
         })
@@ -72,13 +73,14 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
     let mut rt = tokio::runtime::Builder::new()
         .core_threads(1) // one thread is sufficient
         .build()
-        .expect("Unable to build metrics exporter tokio runtime");
+        .expect("Builds one thread of tokio runtime exporter for prometheus");
 
     std::thread::spawn(move || {
         rt.spawn(server);
         rt.shutdown_on_idle().wait().unwrap();
     });
 }
+
 ```
 
 client/prometheus/Cargo.toml
@@ -136,7 +138,7 @@ members = [
         ....
 ```
 
-### metrics add
+### Metrics Add 
 ex) consensus_FINALITY_HEIGHT
 
 client/prometheus/src/metrics.rs
@@ -164,6 +166,12 @@ lazy_static! {
 
     );
 }
+```
+client/service/Cargo.toml
+```rust
+...
+promet = { package = "substrate-prometheus", path="../prometheus"}
+...
 ```
 client/service/src/builder.rs
 ```rust
