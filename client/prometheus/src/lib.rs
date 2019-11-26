@@ -6,7 +6,7 @@ use hyper::http::StatusCode;
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
-use prometheus::{Encoder, Opts, TextEncoder};
+use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
 pub use prometheus::{Histogram, IntCounter, IntGauge, Result};
 pub use sr_primitives::traits::SaturatedConversion;
 use std::net::SocketAddr;

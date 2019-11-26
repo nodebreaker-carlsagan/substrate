@@ -20,7 +20,7 @@ pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     }
 }
 
-pub fn set_histogram(histogram: &Result<Histogram> value: f64) {
+pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
     if let Ok(histogram) = histogram {
         histogram.observe(value)
     }
@@ -56,7 +56,7 @@ lazy_static! {
         "consensus_byzantine_validators_power",
         "Total voting power of the byzantine validators"
     );
-    pub static ref BLOCK_INTERVAL_SECONDS: Result<Histogram> = try_create_int_gauge(
+    pub static ref BLOCK_INTERVAL_SECONDS: Result<Histogram> = try_create_histogram(
         "consensus_block_interval_seconds",
         "Time between this and last block(Block.Header.Time) in seconds"
     );
