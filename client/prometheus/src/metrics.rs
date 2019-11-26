@@ -7,9 +7,22 @@ pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     Ok(gauge)
 }
 
+pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
+    let opts = HistogramOpts::new(name, help);
+    let histogram = Histogram::with_opts(opts)?;
+    prometheus::register(Box::new(histogram.clone()))?;
+    Ok(histogram)
+}
+
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
+    }
+}
+
+pub fn set_histogram(histogram: &Result<Histogram> value: f64) {
+    if let Ok(histogram) = histogram {
+        histogram.observe(value)
     }
 }
 
@@ -22,6 +35,30 @@ lazy_static! {
     pub static ref BEST_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "consensus_best_block_height_number",
         "block is best HEIGHT"
+    );
+    pub static ref VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
+        "consensus_best_block_height_number",
+        "Total voting power of all validators"
+    );
+    pub static ref MISSING_VALIDATORS: Result<IntGauge> = try_create_int_gauge(
+        "consensus_missing_validators",
+        "Number of validators who did not sign"
+    );
+    pub static ref MISSING_VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
+        "consensus_missing_validators_power",
+        "Total voting power of the missing validators"
+    );
+    pub static ref BYZANTINE_VALIDATORS: Result<IntGauge> = try_create_int_gauge(
+        "consensus_byzantine_validators",
+        "Number of validators who tried to double sign"
+    );
+    pub static ref BYZANTINE_VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
+        "consensus_byzantine_validators_power",
+        "Total voting power of the byzantine validators"
+    );
+    pub static ref BLOCK_INTERVAL_SECONDS: Result<Histogram> = try_create_int_gauge(
+        "consensus_block_interval_seconds",
+        "Time between this and last block(Block.Header.Time) in seconds"
     );
     pub static ref P2P_PEERS_NUM: Result<IntGauge> = try_create_int_gauge(
         "p2p_peers_number",

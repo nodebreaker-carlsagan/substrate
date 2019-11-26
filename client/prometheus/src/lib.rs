@@ -61,7 +61,11 @@ macro_rules! prometheus(
   ($($metric:expr => $value:expr),*) => {
     use $crate::{metrics::*};
     $(
-            metrics::set_gauge(&$metric, $value);
+        match $metric {
+            Result<IntGauge> => metrics::set_gauge(&$metric, $value),
+            Result<Histogram> => metrics::set_histogram(&$metric, $value),
+            _ => ()
+        }
       //metrics.entry($key).or_insert_with(Vec::new).push(($value as f32, now));
     )*
   }
