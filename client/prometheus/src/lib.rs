@@ -6,7 +6,7 @@ use hyper::http::StatusCode;
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
-use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
+pub use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
 pub use prometheus::{Histogram, IntCounter, IntGauge, Result};
 pub use sr_primitives::traits::SaturatedConversion;
 use std::net::SocketAddr;
@@ -61,12 +61,7 @@ macro_rules! prometheus(
   ($($metric:expr => $value:expr),*) => {
     use $crate::{metrics::*};
     $(
-        match $metric {
-            Result<IntGauge> => metrics::set_gauge(&$metric, $value),
-            Result<Histogram> => metrics::set_histogram(&$metric, $value),
-            _ => ()
-        }
-      //metrics.entry($key).or_insert_with(Vec::new).push(($value as f32, now));
+            metrics::set_gauge(&$metric, $value);
     )*
   }
 );

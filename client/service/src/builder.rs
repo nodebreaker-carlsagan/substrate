@@ -1354,6 +1354,7 @@ impl<TBl, TRtApi, TCfg, TGen, TCSExt, TBackend, TExec, TSc, TImpQu, TNetP, TExPo
 					"bandwidth_upload" => bandwidth_upload,
 					"used_state_cache_size" => used_state_cache_size,
 				);
+
 				prometheus!(
 				  FINALITY_HEIGHT => finalized_number as u64,
 				  BEST_HEIGHT => best_number as u64,
@@ -1361,6 +1362,7 @@ impl<TBl, TRtApi, TCfg, TGen, TCSExt, TBackend, TExec, TSc, TImpQu, TNetP, TExPo
 				  P2P_NODE_DOWNLOAD => net_status.average_download_per_sec as u64,
 				  P2P_NODE_UPLOAD => net_status.average_upload_per_sec as u64
 				);
+				
 				Ok(())
 			})
 			.select(exit.clone())
