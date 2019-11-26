@@ -18,10 +18,15 @@ use ansi_term::Colour;
 use client_api::ClientInfo;
 use log::info;
 use network::SyncState;
-use sr_primitives::traits::{Block as BlockT, CheckedDiv, NumberFor, Zero, Saturating,SaturatedConversion};
 use service::NetworkStatus;
-use std::{convert::{TryFrom, TryInto}, fmt, time};
-use substrate_prometheus::{metrics};
+use sr_primitives::traits::{
+	Block as BlockT, CheckedDiv, NumberFor, SaturatedConversion, Saturating, Zero,
+};
+use std::{
+	convert::{TryFrom, TryInto},
+	fmt, time,
+};
+use substrate_prometheus::prometheus;
 /// State of the informant display system.
 ///
 /// This is the system that handles the line that gets regularly printed and that looks something
@@ -63,8 +68,11 @@ impl<B: BlockT> InformantDisplay<B> {
 		let (status, target) = match (net_status.sync_state, net_status.best_seen_block) {
 			(SyncState::Idle, _) => ("Idle".into(), "".into()),
 			(SyncState::Downloading, None) => (format!("Syncing{}", speed), "".into()),
-			(SyncState::Downloading, Some(n)) => { metrics::set_gauge(&metrics::TARGET_NUM, n.saturated_into().try_into().unwrap()); (format!("Syncing{}", speed), format!(", target=#{}", n))},
-		  };
+			(SyncState::Downloading, Some(n)) => {
+				prometheus!(TARGET_NUM => n.saturated_into().try_into().unwrap());
+				(format!("Syncing{}", speed), format!(", target=#{}", n))
+			}
+		};
 		info!(
 			target: "substrate",
 			"{}{} ({} peers), best: #{} ({}), finalized #{} ({}), ⬇ {} ⬆ {}",
@@ -86,7 +94,7 @@ impl<B: BlockT> InformantDisplay<B> {
 fn speed<B: BlockT>(
 	best_number: NumberFor<B>,
 	last_number: Option<NumberFor<B>>,
-	last_update: time::Instant
+	last_update: time::Instant,
 ) -> String {
 	// Number of milliseconds elapsed since last time.
 	let elapsed_ms = {
@@ -99,25 +107,29 @@ fn speed<B: BlockT>(
 	// Number of blocks that have been imported since last time.
 	let diff = match last_number {
 		None => return String::new(),
-		Some(n) => best_number.saturating_sub(n)
+		Some(n) => best_number.saturating_sub(n),
 	};
 
 	if let Ok(diff) = TryInto::<u128>::try_into(diff) {
 		// If the number of blocks can be converted to a regular integer, then it's easy: just
 		// do the math and turn it into a `f64`.
-		let speed = diff.saturating_mul(10_000).checked_div(u128::from(elapsed_ms))
-			.map_or(0.0, |s| s as f64) / 10.0;
+		let speed = diff
+			.saturating_mul(10_000)
+			.checked_div(u128::from(elapsed_ms))
+			.map_or(0.0, |s| s as f64)
+			/ 10.0;
 		format!(" {:4.1} bps", speed)
-
 	} else {
 		// If the number of blocks can't be converted to a regular integer, then we need a more
 		// algebraic approach and we stay within the realm of integers.
 		let one_thousand = NumberFor::<B>::from(1_000);
 		let elapsed = NumberFor::<B>::from(
-			<u32 as TryFrom<_>>::try_from(elapsed_ms).unwrap_or(u32::max_value())
+			<u32 as TryFrom<_>>::try_from(elapsed_ms).unwrap_or(u32::max_value()),
 		);
 
-		let speed = diff.saturating_mul(one_thousand).checked_div(&elapsed)
+		let speed = diff
+			.saturating_mul(one_thousand)
+			.checked_div(&elapsed)
 			.unwrap_or_else(Zero::zero);
 		format!(" {} bps", speed)
 	}
@@ -130,17 +142,17 @@ impl fmt::Display for TransferRateFormat {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		// Special case 0.
 		if self.0 == 0 {
-			return write!(f, "0")
+			return write!(f, "0");
 		}
 
 		// Under 0.1 kiB, display plain bytes.
 		if self.0 < 100 {
-			return write!(f, "{} B/s", self.0)
+			return write!(f, "{} B/s", self.0);
 		}
 
 		// Under 1.0 MiB/sec, display the value in kiB/sec.
 		if self.0 < 1024 * 1024 {
-			return write!(f, "{:.1}kiB/s", self.0 as f64 / 1024.0)
+			return write!(f, "{:.1}kiB/s", self.0 as f64 / 1024.0);
 		}
 
 		write!(f, "{:.1}MiB/s", self.0 as f64 / (1024.0 * 1024.0))

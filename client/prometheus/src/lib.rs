@@ -6,13 +6,12 @@ use hyper::http::StatusCode;
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
-use prometheus::{ Encoder,  TextEncoder,Opts};
-use std::{net::{ SocketAddr}};
-pub use sr_primitives::traits::SaturatedConversion;
+use prometheus::{Encoder, Opts, TextEncoder};
 pub use prometheus::{Histogram, IntCounter, IntGauge, Result};
+pub use sr_primitives::traits::SaturatedConversion;
+use std::net::SocketAddr;
 
 pub mod metrics;
-
 
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
@@ -24,13 +23,11 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
             // `service_fn_ok` is a helper to convert a function that
             // returns a Response into a `Service`.
             service_fn_ok(move |req: Request<Body>| {
-                
                 if req.uri().path() == "/metrics" {
                     let metric_families = prometheus::gather();
                     let mut buffer = vec![];
                     let encoder = TextEncoder::new();
                     encoder.encode(&metric_families, &mut buffer).unwrap();
-                
                     Response::builder()
                         .status(StatusCode::OK)
                         .header("Content-Type", encoder.format_type())
@@ -58,3 +55,14 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
         rt.shutdown_on_idle().wait().unwrap();
     });
 }
+
+#[macro_export]
+macro_rules! prometheus(
+  ($($metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+            metrics::set_gauge(&$metric, $value);
+      //metrics.entry($key).or_insert_with(Vec::new).push(($value as f32, now));
+    )*
+  }
+);
