@@ -20,7 +20,7 @@ use log::info;
 use network::SyncState;
 use service::NetworkStatus;
 use sr_primitives::traits::{
-	Block as BlockT, CheckedDiv, NumberFor, SaturatedConversion, Saturating, Zero,
+	Block as BlockT, CheckedDiv, NumberFor, Saturating, Zero,
 };
 use std::{
 	convert::{TryFrom, TryInto},
