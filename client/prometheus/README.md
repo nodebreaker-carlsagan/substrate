@@ -131,7 +131,7 @@ macro_rules! prometheus(
 */
 ```
 
-Here is the dependancies of the module.
+Here is the dependancies of the module.	
 client/prometheus/Cargo.toml
 ```toml
 [package]
@@ -328,6 +328,10 @@ use promet::{prometheus_gauge};
 			);
 
 			prometheus_gauge!(
+				  MEMPOOL_SIZE => used_state_cache_size as u64,
+				  NODE_MEMORY => memory as u64,
+				  NODE_CPU => cpu_usage as u64,
+				  TX_COUNT => txpool_status.ready as u64,
 				  FINALITY_HEIGHT => finalized_number as u64,
 				  BEST_HEIGHT => best_number as u64,
 				  P2P_PEERS_NUM => num_peers as u64,
@@ -350,28 +354,19 @@ Metrics will be served under /metrics on 33333 port by default.
 
 Consensus metrics, namespace: `substrate`
 
-| **Name**                                            | **Type**  | **Tags** | **Description**                                                 |
-| --------------------------------------------------- | --------- | -------- | --------------------------------------------------------------- |
-| consensus_FINALITY_HEIGHT                           | IntGauge  |          | finality Height of the chain                                    |
-| consensus_BEST_HEIGHT                               | IntGauge  |          | best Height of the chain                                        |
-| consensus_TARGET_HEIGHT                             | IntGauge  |          | syning Height target number                                     |
-| consensus_block_interval_seconds(Add in the future) | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
-| consensus_rounds(Add in the future)                 | Gauge     |          | Number of rounds                                                |
-| consensus_num_txs(Add in the future)                | Gauge     |          | Number of transactions                                          |
-| consensus_block_parts(Add in the future)            | counter   |          | number of blockparts transmitted by peer                        |
-| consensus_total_txs(Add in the future)              | Gauge     |          | Total number of transactions committed                          |
-| consensus_block_size_bytes(Add in the future)       | Gauge     |          | Block size in bytes                                             |
-| p2p_peers_number                                    | IntGauge  |          | Number of peers node's connected to                             |
-| p2p_peer_receive_bytes_total                        | IntGauge  |          | number of bytes received from a given peer                      |
-| p2p_peer_send_bytes_total                           | IntGauge  |          | number of bytes sent to a given peer                            |
-| mempool_size(Add in the future)                     | Gauge     |          | Number of uncommitted transactions                              |
-| mempool_tx_size_bytes(Add in the future)            | histogram |          | transaction sizes in bytes                                      |
-| mempool_failed_txs(Add in the future)               | counter   |          | number of failed transactions                                   |
-| mempool_recheck_times(Add in the future)            | counter   |          | number of transactions rechecked in the mempool                 |
-| state_block_processing_time(Add in the future)      | histogram |          | time between BeginBlock and EndBlock in ms                      |
-| state_recheck_time(Add in the future)               | histogram |          | time cost on recheck in ms                                      |
-| state_app_hash_conflict(Add in the future)          | count     |          | App hash conflict error                                         |
-
+| **Name**                               | **Type**  | **Tags** | **Description**                                                 |
+| -------------------------------------- | --------- | -------- | --------------------------------------------------------------- |
+| consensus_finality_block_height_number | IntGauge  |          | finality Height of the chain                                    |
+| consensus_best_block_height_number     | IntGauge  |          | best Height of the chain                                        |
+| consensus_target_syn_number            | IntGauge  |          | syning Height target number                                     |
+| consensus_block_interval_seconds       | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
+| consensus_num_txs                      | Gauge     |          | Number of transactions                                          |
+| consensus_node_memory                  | IntGauge  |          | Node's primary memory                                           |
+| consensus_node_cpu                     | IntGauge  |          | Node's cpu load                                                 |
+| p2p_peers_number                       | IntGauge  |          | Number of peers node's connected to                             |
+| p2p_peer_receive_bytes_per_sec         | IntGauge  |          | number of bytes received from a given peer                      |
+| p2p_peer_send_bytes_per_sec            | IntGauge  |          | number of bytes sent to a given peer                            |
+| mempool_size                           | IntGauge  |          | Number of uncommitted transactions                              |
 
 
 ## Start Prometheus
