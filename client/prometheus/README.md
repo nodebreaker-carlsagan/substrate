@@ -1,12 +1,12 @@
-# Substrate Monitor tool Prometheus
+# Substrate Prometheus Node Exporter
 
 ## Introduction
 
-Prometheus is one of the most widely used monitoring tool for managing high availability services. By providing Prometheus service in substrate, node operators can easily adopt widely used display/alert tool such as Grafana without seting-up/operating external Prometheus agent. Easy access to such monitoring tools will benefit node operators to have much higher availability quality of their services.
+Prometheus is one of the most widely used monitoring tool for managing high availability services supported by [Cloud Native Computing Foundation](https://www.cncf.io/). By providing Prometheus exporter in substrate, node operators can easily adopt widely used display/alert tool such as Grafana without seting-up/operating external Prometheus agent through RPC connections. Easy access to such monitoring tools will benefit parachain develepers/operators and validators to have much higher availability quality of their services.
 
 ## List of Contents
 
-Substrate Dev hack
+Hack Prometheus in Substrate
  - Prometheus starter
  - CLI Config
  - Metrics Add
@@ -25,9 +25,10 @@ Start Grafana
 ## Substrate Dev hack
 ### Prometheus starter
 
+Here is the entry point of prometheus core module in Parity Substrate.
+
 client/prometheus/src/lib.rs
 ```rust
-
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -36,13 +37,12 @@ use hyper::http::StatusCode;
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
-use prometheus::{ Encoder,  TextEncoder,Opts};
-use std::{net::{ SocketAddr}};
-pub use sr_primitives::traits::SaturatedConversion;
+pub use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
 pub use prometheus::{Histogram, IntCounter, IntGauge, Result};
+pub use sr_primitives::traits::SaturatedConversion;
+use std::net::SocketAddr;
 
 pub mod metrics;
-
 
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
@@ -54,13 +54,11 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
             // `service_fn_ok` is a helper to convert a function that
             // returns a Response into a `Service`.
             service_fn_ok(move |req: Request<Body>| {
-                
                 if req.uri().path() == "/metrics" {
                     let metric_families = prometheus::gather();
                     let mut buffer = vec![];
                     let encoder = TextEncoder::new();
                     encoder.encode(&metric_families, &mut buffer).unwrap();
-                
                     Response::builder()
                         .status(StatusCode::OK)
                         .header("Content-Type", encoder.format_type())
@@ -89,8 +87,51 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
     });
 }
 
+#[macro_export]
+macro_rules! prometheus_gauge(
+  ($($metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+        metrics::set_gauge(&$metric, $value);
+    )*
+  }
+);
+
+#[macro_export]
+macro_rules! prometheus_histogram(
+  ($($metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+        metrics::set_histogram(&$metric, $value);
+    )*
+  }
+);
+
+#[macro_export]
+macro_rules! prometheus_counter(
+  ($($metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+        metrics::set_counter(&$metric, $value);
+    )*
+  }
+);
+
+/*
+TODO: Make abstract type for all metrics(e.g. Gauge, Histogram, Counter) with generic traits so that all metrics can be set up with one function `set`
+#[macro_export]
+macro_rules! prometheus(
+  ($($a: expr; $metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+        metrics::set(#$a, &$metric, $value);
+    )*
+  }
+);
+*/
 ```
 
+Here is the dependancies of the module.
 client/prometheus/Cargo.toml
 ```toml
 [package]
@@ -110,12 +151,16 @@ tokio = "0.1"
 [dev-dependencies]
 reqwest = "0.9"
 ```
+
+**Abbreviation of the package in service manager of parity substrate**
 client/service/Cargo.toml
 ```toml
 ....
 promet = { package = "substrate-prometheus", path="../../core/prometheus"}
 ....
 ```
+
+**Metrics builder as same as substrate-telemetry**
 client/service/src/builder.rs
 ```rust
 
@@ -159,6 +204,7 @@ fn crate_run_node_config
 			}
 	}
 ...
+
 ```
 
 client/cli/src/params.rs
@@ -239,7 +285,7 @@ promet = { package = "substrate-prometheus", path="../prometheus"}
 client/service/src/builder.rs
 ```rust
 .....
-use promet::{metrics};
+use promet::{prometheus_gauge};
 .....
 		let tel_task = state_rx.for_each(move |(net_status, _)| {
 			let info = client_.info();
@@ -280,7 +326,14 @@ use promet::{metrics};
 				"bandwidth_upload" => bandwidth_upload,
 				"used_state_cache_size" => used_state_cache_size,
 			);
-            metrics::set_gauge(&metrics::FINALITY_HEIGHT, finalized_number as u64);
+
+			prometheus_gauge!(
+				  FINALITY_HEIGHT => finalized_number as u64,
+				  BEST_HEIGHT => best_number as u64,
+				  P2P_PEERS_NUM => num_peers as u64,
+				  P2P_NODE_DOWNLOAD => net_status.average_download_per_sec as u64,
+				  P2P_NODE_UPLOAD => net_status.average_upload_per_sec as u64
+				);
 .....
 ```
 ## Metrics
@@ -297,32 +350,32 @@ Metrics will be served under /metrics on 33333 port by default.
 
 Consensus metrics, namespace: `substrate`
 
-| **Name**                                | **Type**  | **Tags** | **Description**                                                 |
-|-----------------------------------------|-----------|----------|-----------------------------------------------------------------|
-| consensus_FINALITY_HEIGHT               | IntGauge  |          | finality Height of the chain                                    |
-| consensus_BEST_HEIGHT                   | IntGauge  |          | best Height of the chain                                        |
-| consensus_TARGET_HEIGHT                 | IntGauge  |          | syning Height target number                                     |
-| consensus_validators_power(Add in the future)              | IntGauge  |          | Total voting power of all validators                            |
-| consensus_missing_validators(Add in the future)            | Gauge     |          | Number of validators who did not sign                           |
-| consensus_missing_validators_power(Add in the future)      | Gauge     |          | Total voting power of the missing validators                    |
-| consensus_byzantine_validators(Add in the future)          | Gauge     |          | Number of validators who tried to double sign                   |
-| consensus_byzantine_validators_power(Add in the future)    | Gauge     |          | Total voting power of the byzantine validators                  |
-| consensus_block_interval_seconds(Add in the future)        | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
-| consensus_rounds(Add in the future)                        | Gauge     |          | Number of rounds                                                |
-| consensus_num_txs(Add in the future)                       | Gauge     |          | Number of transactions                                          |
-| consensus_block_parts(Add in the future)                   | counter   |          | number of blockparts transmitted by peer                        |
-| consensus_total_txs(Add in the future)                     | Gauge     |          | Total number of transactions committed                          |
-| consensus_block_size_bytes(Add in the future)              | Gauge     |          | Block size in bytes                                             |
-| p2p_peers_number                        | IntGauge  |          | Number of peers node's connected to                             |
-| p2p_peer_receive_bytes_total            | IntGauge  |          | number of bytes received from a given peer                      |
-| p2p_peer_send_bytes_total               | IntGauge  |          | number of bytes sent to a given peer                            |
-| mempool_size(Add in the future)                            | Gauge     |          | Number of uncommitted transactions                              |
-| mempool_tx_size_bytes(Add in the future)                   | histogram |          | transaction sizes in bytes                                      |
-| mempool_failed_txs(Add in the future)                      | counter   |          | number of failed transactions                                   |
-| mempool_recheck_times(Add in the future)                   | counter   |          | number of transactions rechecked in the mempool                 |
-| state_block_processing_time(Add in the future)             | histogram |          | time between BeginBlock and EndBlock in ms                      |
-| state_recheck_time(Add in the future)                      | histogram |          | time cost on recheck in ms                                      |
-| state_app_hash_conflict(Add in the future)                 | count     |          | App hash conflict error                                         |
+| **Name**                                                | **Type**  | **Tags** | **Description**                                                 |
+| ------------------------------------------------------- | --------- | -------- | --------------------------------------------------------------- |
+| consensus_FINALITY_HEIGHT                               | IntGauge  |          | finality Height of the chain                                    |
+| consensus_BEST_HEIGHT                                   | IntGauge  |          | best Height of the chain                                        |
+| consensus_TARGET_HEIGHT                                 | IntGauge  |          | syning Height target number                                     |
+| consensus_validators_power(Add in the future)           | IntGauge  |          | Total voting power of all validators                            |
+| consensus_missing_validators(Add in the future)         | Gauge     |          | Number of validators who did not sign                           |
+| consensus_missing_validators_power(Add in the future)   | Gauge     |          | Total voting power of the missing validators                    |
+| consensus_byzantine_validators(Add in the future)       | Gauge     |          | Number of validators who tried to double sign                   |
+| consensus_byzantine_validators_power(Add in the future) | Gauge     |          | Total voting power of the byzantine validators                  |
+| consensus_block_interval_seconds(Add in the future)     | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
+| consensus_rounds(Add in the future)                     | Gauge     |          | Number of rounds                                                |
+| consensus_num_txs(Add in the future)                    | Gauge     |          | Number of transactions                                          |
+| consensus_block_parts(Add in the future)                | counter   |          | number of blockparts transmitted by peer                        |
+| consensus_total_txs(Add in the future)                  | Gauge     |          | Total number of transactions committed                          |
+| consensus_block_size_bytes(Add in the future)           | Gauge     |          | Block size in bytes                                             |
+| p2p_peers_number                                        | IntGauge  |          | Number of peers node's connected to                             |
+| p2p_peer_receive_bytes_total                            | IntGauge  |          | number of bytes received from a given peer                      |
+| p2p_peer_send_bytes_total                               | IntGauge  |          | number of bytes sent to a given peer                            |
+| mempool_size(Add in the future)                         | Gauge     |          | Number of uncommitted transactions                              |
+| mempool_tx_size_bytes(Add in the future)                | histogram |          | transaction sizes in bytes                                      |
+| mempool_failed_txs(Add in the future)                   | counter   |          | number of failed transactions                                   |
+| mempool_recheck_times(Add in the future)                | counter   |          | number of transactions rechecked in the mempool                 |
+| state_block_processing_time(Add in the future)          | histogram |          | time between BeginBlock and EndBlock in ms                      |
+| state_recheck_time(Add in the future)                   | histogram |          | time cost on recheck in ms                                      |
+| state_app_hash_conflict(Add in the future)              | count     |          | App hash conflict error                                         |
 
 
 

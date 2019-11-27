@@ -86,6 +86,8 @@ macro_rules! prometheus_counter(
   }
 );
 
+/*
+TODO: Make abstract type for all metrics(e.g. Gauge, Histogram, Counter) with generic traits so that all metrics can be set up with one function `set`
 #[macro_export]
 macro_rules! prometheus(
   ($($a: expr; $metric:expr => $value:expr),*) => {
@@ -95,3 +97,4 @@ macro_rules! prometheus(
     )*
   }
 );
+*/
