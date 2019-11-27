@@ -14,6 +14,13 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
+pub fn try_create_counter(name: &str, help: &str) -> Result<IntCounter> {
+    let opts = CounterOpts::new(name, help);
+    let counter = IntCounter::with_opts(opts)?;
+    prometheus::registrer(Box::new(counter.clone()))?;
+    Ok(counter)
+}
+
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
@@ -23,6 +30,12 @@ pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
 pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
     if let Ok(histogram) = histogram {
         histogram.observe(value)
+    }
+}
+
+pub fn set_counter(counter: &Result<IntCounter>, value: u64) {
+    if let Ok(counter) = counter {
+        counter.set(value as i64);
     }
 }
 
