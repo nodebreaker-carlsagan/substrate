@@ -152,7 +152,7 @@ tokio = "0.1"
 reqwest = "0.9"
 ```
 
-**Abbreviation of the package in service manager of parity substrate**
+**Abbreviation of the package in service manager of parity substrate**	
 client/service/Cargo.toml
 ```toml
 ....
@@ -160,7 +160,7 @@ promet = { package = "substrate-prometheus", path="../../core/prometheus"}
 ....
 ```
 
-**Metrics builder as same as substrate-telemetry**
+**Metrics builder as same as substrate-telemetry**	
 client/service/src/builder.rs
 ```rust
 
