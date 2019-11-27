@@ -76,6 +76,7 @@ macro_rules! prometheus_histogram(
   }
 );
 
+<<<<<<< HEAD
 #[macro_export]
 macro_rules! prometheus_counter(
   ($($metric:expr => $value:expr),*) => {
@@ -98,3 +99,5 @@ macro_rules! prometheus(
   }
 );
 */
+=======
+>>>>>>> 5842caed0503c4f4b88bd72485d289a1731a9729
