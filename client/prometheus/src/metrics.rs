@@ -2,7 +2,7 @@ pub use crate::*;
 
 pub const GAUGE: u8 = 1;
 pub const HISTOGRAM: u8 = 2;
-pub const COUNTER: u8 = 3;
+//pub const COUNTER: u8 = 3;
 
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
@@ -18,12 +18,14 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
+/*
 pub fn try_create_counter(name: &str, help: &str) -> Result<IntCounter> {
     let opts = CounterOpts::new(name, help);
     let counter = IntCounter::with_opts(opts)?;
     prometheus::register(Box::new(counter.clone()))?;
     Ok(counter)
 }
+*/
 
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
@@ -37,17 +39,24 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
     }
 }
 
-pub fn set_counter(counter: &Result<IntCounter>, value: u64) {
-    if let Ok(counter) = counter {
-        counter.inc(value as i64);
-    }
+//pub fn set_counter(counter: &Result<IntCounter>, value: u64) {
+ //   if let Ok(counter) = counter {
+  //      counter.inc(value as i64);
+   // }
+//}
+//pub trait a {}
+//impl trait for u64 {}
+//impl trait for f64 {}
+pub struct Metric_type {
+    gauge: Gauge,
+    histogram: Histogram,
 }
-
-pub fn set<T, U>(type: u8, metric: &Result<U>, <value: T) {
-    match type {
-        GAUGE => set_gauge(&metric, value),
-        HISTOGRAM => set_histogram(&metric, value),
-        COUNTER => set_counter(&metric, value),
+pub fn set<T, U>(widget: u8, metric: Metric_type, value: a) {
+    match widget {
+        GAUGE => set_gauge(metric, u64::from(value)),
+        HISTOGRAM => set_histogram(metric, f64::from(value)),
+        // COUNTER => set_counter(&metric, value),
+        _ => (),
     };
 }
 
