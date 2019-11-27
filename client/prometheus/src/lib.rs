@@ -57,7 +57,7 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
 }
 
 #[macro_export]
-macro_rules! prometheus(
+macro_rules! prometheus_gauge(
   ($($metric:expr => $value:expr),*) => {
     use $crate::{metrics::*};
     $(
@@ -82,6 +82,16 @@ macro_rules! prometheus_counter(
     use $crate::{metrics::*};
     $(
         metrics::set_counter(&$metric, $value);
+    )*
+  }
+);
+
+#[macro_export]
+macro_rules! prometheus(
+  ($($a: expr; $metric:expr => $value:expr),*) => {
+    use $crate::{metrics::*};
+    $(
+        metrics::set(#$a, &$metric, $value);
     )*
   }
 );

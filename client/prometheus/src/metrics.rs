@@ -1,5 +1,8 @@
 pub use crate::*;
 
+pub const GAUGE: u8 = 1;
+pub const HISTOGRAM: u8 = 2;
+pub const COUNTER: u8 = 3;
 
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
@@ -18,7 +21,7 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
 pub fn try_create_counter(name: &str, help: &str) -> Result<IntCounter> {
     let opts = CounterOpts::new(name, help);
     let counter = IntCounter::with_opts(opts)?;
-    prometheus::registrer(Box::new(counter.clone()))?;
+    prometheus::register(Box::new(counter.clone()))?;
     Ok(counter)
 }
 
@@ -26,7 +29,6 @@ pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
     }
-    
 }
 
 pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
@@ -37,8 +39,16 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
 
 pub fn set_counter(counter: &Result<IntCounter>, value: u64) {
     if let Ok(counter) = counter {
-        counter.set(value as i64);
+        counter.inc(value as i64);
     }
+}
+
+pub fn set<T, U>(type: u8, metric: &Result<U>, <value: T) {
+    match type {
+        GAUGE => set_gauge(&metric, value),
+        HISTOGRAM => set_histogram(&metric, value),
+        COUNTER => set_counter(&metric, value),
+    };
 }
 
 lazy_static! {
