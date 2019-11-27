@@ -350,32 +350,27 @@ Metrics will be served under /metrics on 33333 port by default.
 
 Consensus metrics, namespace: `substrate`
 
-| **Name**                                                | **Type**  | **Tags** | **Description**                                                 |
-| ------------------------------------------------------- | --------- | -------- | --------------------------------------------------------------- |
-| consensus_FINALITY_HEIGHT                               | IntGauge  |          | finality Height of the chain                                    |
-| consensus_BEST_HEIGHT                                   | IntGauge  |          | best Height of the chain                                        |
-| consensus_TARGET_HEIGHT                                 | IntGauge  |          | syning Height target number                                     |
-| consensus_validators_power(Add in the future)           | IntGauge  |          | Total voting power of all validators                            |
-| consensus_missing_validators(Add in the future)         | Gauge     |          | Number of validators who did not sign                           |
-| consensus_missing_validators_power(Add in the future)   | Gauge     |          | Total voting power of the missing validators                    |
-| consensus_byzantine_validators(Add in the future)       | Gauge     |          | Number of validators who tried to double sign                   |
-| consensus_byzantine_validators_power(Add in the future) | Gauge     |          | Total voting power of the byzantine validators                  |
-| consensus_block_interval_seconds(Add in the future)     | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
-| consensus_rounds(Add in the future)                     | Gauge     |          | Number of rounds                                                |
-| consensus_num_txs(Add in the future)                    | Gauge     |          | Number of transactions                                          |
-| consensus_block_parts(Add in the future)                | counter   |          | number of blockparts transmitted by peer                        |
-| consensus_total_txs(Add in the future)                  | Gauge     |          | Total number of transactions committed                          |
-| consensus_block_size_bytes(Add in the future)           | Gauge     |          | Block size in bytes                                             |
-| p2p_peers_number                                        | IntGauge  |          | Number of peers node's connected to                             |
-| p2p_peer_receive_bytes_total                            | IntGauge  |          | number of bytes received from a given peer                      |
-| p2p_peer_send_bytes_total                               | IntGauge  |          | number of bytes sent to a given peer                            |
-| mempool_size(Add in the future)                         | Gauge     |          | Number of uncommitted transactions                              |
-| mempool_tx_size_bytes(Add in the future)                | histogram |          | transaction sizes in bytes                                      |
-| mempool_failed_txs(Add in the future)                   | counter   |          | number of failed transactions                                   |
-| mempool_recheck_times(Add in the future)                | counter   |          | number of transactions rechecked in the mempool                 |
-| state_block_processing_time(Add in the future)          | histogram |          | time between BeginBlock and EndBlock in ms                      |
-| state_recheck_time(Add in the future)                   | histogram |          | time cost on recheck in ms                                      |
-| state_app_hash_conflict(Add in the future)              | count     |          | App hash conflict error                                         |
+| **Name**                                            | **Type**  | **Tags** | **Description**                                                 |
+| --------------------------------------------------- | --------- | -------- | --------------------------------------------------------------- |
+| consensus_FINALITY_HEIGHT                           | IntGauge  |          | finality Height of the chain                                    |
+| consensus_BEST_HEIGHT                               | IntGauge  |          | best Height of the chain                                        |
+| consensus_TARGET_HEIGHT                             | IntGauge  |          | syning Height target number                                     |
+| consensus_block_interval_seconds(Add in the future) | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
+| consensus_rounds(Add in the future)                 | Gauge     |          | Number of rounds                                                |
+| consensus_num_txs(Add in the future)                | Gauge     |          | Number of transactions                                          |
+| consensus_block_parts(Add in the future)            | counter   |          | number of blockparts transmitted by peer                        |
+| consensus_total_txs(Add in the future)              | Gauge     |          | Total number of transactions committed                          |
+| consensus_block_size_bytes(Add in the future)       | Gauge     |          | Block size in bytes                                             |
+| p2p_peers_number                                    | IntGauge  |          | Number of peers node's connected to                             |
+| p2p_peer_receive_bytes_total                        | IntGauge  |          | number of bytes received from a given peer                      |
+| p2p_peer_send_bytes_total                           | IntGauge  |          | number of bytes sent to a given peer                            |
+| mempool_size(Add in the future)                     | Gauge     |          | Number of uncommitted transactions                              |
+| mempool_tx_size_bytes(Add in the future)            | histogram |          | transaction sizes in bytes                                      |
+| mempool_failed_txs(Add in the future)               | counter   |          | number of failed transactions                                   |
+| mempool_recheck_times(Add in the future)            | counter   |          | number of transactions rechecked in the mempool                 |
+| state_block_processing_time(Add in the future)      | histogram |          | time between BeginBlock and EndBlock in ms                      |
+| state_recheck_time(Add in the future)               | histogram |          | time cost on recheck in ms                                      |
+| state_app_hash_conflict(Add in the future)          | count     |          | App hash conflict error                                         |
 
 
 

@@ -14,7 +14,6 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
-
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
@@ -26,7 +25,6 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
         histogram.observe(value)
     }
 }
-
 
 lazy_static! {
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
@@ -51,7 +49,6 @@ lazy_static! {
         "consensus_target_syn_number",
         "block syn target number"
     );
-
     pub static ref TX_COUNT: Result<IntGauge> = try_create_int_gauge(
         "consensus_num_txs",
         "Number of transactions"
@@ -78,5 +75,3 @@ lazy_static! {
         "p2p_node_upload_per_sec_byte"
     );
 }
-
-
