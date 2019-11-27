@@ -1,5 +1,6 @@
 pub use crate::*;
 
+
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
     let gauge = IntGauge::with_opts(opts)?;
@@ -25,6 +26,7 @@ pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
     }
+    
 }
 
 pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
@@ -91,3 +93,5 @@ lazy_static! {
         "p2p_node_upload_per_sec_byte"
     );
 }
+
+
