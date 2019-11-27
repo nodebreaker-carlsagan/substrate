@@ -29,6 +29,7 @@ sr-api = { path = "../../../primitives/sr-api" }
 sr-primitives = {  path = "../../../primitives/sr-primitives" }
 paint-aura = { path = "../../../paint/aura" }
 substrate-telemetry = { path = "../../telemetry" }
+substrate-prometheus = { path = "../../prometheus" }
 
 [dev-dependencies]
 keyring = { package = "substrate-keyring", path = "../../../primitives/keyring" }

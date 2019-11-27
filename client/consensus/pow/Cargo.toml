@@ -18,3 +18,4 @@ consensus-common = { package = "substrate-consensus-common", path = "../../../pr
 log = "0.4.8"
 futures-preview = { version = "0.3.0-alpha.19", features = ["compat"] }
 derive_more = "0.15.0"
+substrate-prometheus = { path = "../../prometheus" }
