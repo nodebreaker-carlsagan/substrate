@@ -76,22 +76,3 @@ macro_rules! prometheus_histogram(
   }
 );
 
-#[macro_export]
-macro_rules! prometheus_counter(
-  ($($metric:expr => $value:expr),*) => {
-    use $crate::{metrics::*};
-    $(
-        metrics::set_counter(&$metric, $value);
-    )*
-  }
-);
-
-#[macro_export]
-macro_rules! prometheus(
-  ($($a: expr; $metric:expr => $value:expr),*) => {
-    use $crate::{metrics::*};
-    $(
-        metrics::set(#$a, &$metric, $value);
-    )*
-  }
-);

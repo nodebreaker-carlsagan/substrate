@@ -37,7 +37,7 @@ use network::{config::BoxFinalityProofRequestBuilder, specialization::NetworkSpe
 use network::{DhtEvent, FinalityProofProvider, NetworkService, NetworkStateInfo, OnDemand};
 use parking_lot::{Mutex, RwLock};
 use primitives::{Blake2Hasher, Hasher, H256};
-use promet::prometheus;
+use promet::prometheus_gauge;
 use rpc;
 use sr_primitives::generic::BlockId;
 use sr_primitives::traits::{
@@ -1355,7 +1355,11 @@ impl<TBl, TRtApi, TCfg, TGen, TCSExt, TBackend, TExec, TSc, TImpQu, TNetP, TExPo
 					"used_state_cache_size" => used_state_cache_size,
 				);
 
-				prometheus!(
+				prometheus_gauge!(
+				  MEMPOOL_SIZE => used_state_cache_size as u64,
+				  NODE_MEMORY => memory as u64,
+				  NODE_CPU => cpu_usage as u64,
+				  TX_COUNT => txpool_status.ready as u64,
 				  FINALITY_HEIGHT => finalized_number as u64,
 				  BEST_HEIGHT => best_number as u64,
 				  P2P_PEERS_NUM => num_peers as u64,

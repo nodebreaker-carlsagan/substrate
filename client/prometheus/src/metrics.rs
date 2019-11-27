@@ -1,9 +1,5 @@
 pub use crate::*;
 
-pub const GAUGE: u8 = 1;
-pub const HISTOGRAM: u8 = 2;
-//pub const COUNTER: u8 = 3;
-
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
     let gauge = IntGauge::with_opts(opts)?;
@@ -18,14 +14,6 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
-/*
-pub fn try_create_counter(name: &str, help: &str) -> Result<IntCounter> {
-    let opts = CounterOpts::new(name, help);
-    let counter = IntCounter::with_opts(opts)?;
-    prometheus::register(Box::new(counter.clone()))?;
-    Ok(counter)
-}
-*/
 
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
@@ -39,26 +27,6 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
     }
 }
 
-//pub fn set_counter(counter: &Result<IntCounter>, value: u64) {
- //   if let Ok(counter) = counter {
-  //      counter.inc(value as i64);
-   // }
-//}
-//pub trait a {}
-//impl trait for u64 {}
-//impl trait for f64 {}
-pub struct Metric_type {
-    gauge: Gauge,
-    histogram: Histogram,
-}
-pub fn set<T, U>(widget: u8, metric: Metric_type, value: a) {
-    match widget {
-        GAUGE => set_gauge(metric, u64::from(value)),
-        HISTOGRAM => set_histogram(metric, f64::from(value)),
-        // COUNTER => set_counter(&metric, value),
-        _ => (),
-    };
-}
 
 lazy_static! {
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
@@ -70,26 +38,7 @@ lazy_static! {
         "consensus_best_block_height_number",
         "block is best HEIGHT"
     );
-    pub static ref VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
-        "consensus_best_block_height_number",
-        "Total voting power of all validators"
-    );
-    pub static ref MISSING_VALIDATORS: Result<IntGauge> = try_create_int_gauge(
-        "consensus_missing_validators",
-        "Number of validators who did not sign"
-    );
-    pub static ref MISSING_VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
-        "consensus_missing_validators_power",
-        "Total voting power of the missing validators"
-    );
-    pub static ref BYZANTINE_VALIDATORS: Result<IntGauge> = try_create_int_gauge(
-        "consensus_byzantine_validators",
-        "Number of validators who tried to double sign"
-    );
-    pub static ref BYZANTINE_VALIDATORS_POWER: Result<IntGauge> = try_create_int_gauge(
-        "consensus_byzantine_validators_power",
-        "Total voting power of the byzantine validators"
-    );
+
     pub static ref BLOCK_INTERVAL_SECONDS: Result<Histogram> = try_create_histogram(
         "consensus_block_interval_seconds",
         "Time between this and last block(Block.Header.Time) in seconds"
@@ -101,6 +50,23 @@ lazy_static! {
     pub static ref TARGET_NUM: Result<IntGauge> = try_create_int_gauge(
         "consensus_target_syn_number",
         "block syn target number"
+    );
+
+    pub static ref TX_COUNT: Result<IntGauge> = try_create_int_gauge(
+        "consensus_num_txs",
+        "Number of transactions"
+    );
+    pub static ref NODE_MEMORY: Result<IntGauge> = try_create_int_gauge(
+        "consensus_node_memory",
+        "node memory"
+    );
+    pub static ref NODE_CPU: Result<IntGauge> = try_create_int_gauge(
+        "consensus_node_cpu",
+        "node cpu"
+    );
+    pub static ref MEMPOOL_SIZE: Result<IntGauge> = try_create_int_gauge(
+        "mempool_size",
+        "Number of uncommitted transactions"
     );
     //net_status.average_download_per_sec
     pub static ref P2P_NODE_DOWNLOAD: Result<IntGauge> = try_create_int_gauge(

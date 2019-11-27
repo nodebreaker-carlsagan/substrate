@@ -26,7 +26,7 @@ use std::{
 	convert::{TryFrom, TryInto},
 	fmt, time,
 };
-use substrate_prometheus::prometheus;
+use substrate_prometheus::prometheus_gauge;
 /// State of the informant display system.
 ///
 /// This is the system that handles the line that gets regularly printed and that looks something
@@ -69,7 +69,7 @@ impl<B: BlockT> InformantDisplay<B> {
 			(SyncState::Idle, _) => ("Idle".into(), "".into()),
 			(SyncState::Downloading, None) => (format!("Syncing{}", speed), "".into()),
 			(SyncState::Downloading, Some(n)) => {
-				prometheus!(TARGET_NUM => n.saturated_into().try_into().unwrap());
+				prometheus_gauge!(TARGET_NUM => n.saturated_into().try_into().unwrap());
 				(format!("Syncing{}", speed), format!(", target=#{}", n))
 			}
 		};

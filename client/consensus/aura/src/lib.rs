@@ -70,7 +70,7 @@ use paint_aura::{
 	},
 	AuraInherentData, InherentType as AuraInherent,
 };
-use substrate_prometheus::prometheus;
+use substrate_prometheus::prometheus_gauge;
 use substrate_telemetry::{telemetry, CONSENSUS_DEBUG, CONSENSUS_INFO, CONSENSUS_TRACE};
 
 use slots::check_equivocation;
@@ -509,7 +509,7 @@ where
 						telemetry!(CONSENSUS_INFO; "aura.halting_for_future_block";
 							"diff" => ?diff
 						);
-						prometheus_gauge!(BLOCK_INTERVAL_SECONDS => ?diff as u64);
+						//prometheus_gauge!(BLOCK_INTERVAL_SECONDS => ?diff as u64);
 						thread::sleep(Duration::from_secs(diff));
 						Ok(())
 					}
