@@ -51,7 +51,7 @@ use std::{
 use wasm_timer::SystemTime;
 use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use sc_telemetry::{telemetry, SUBSTRATE_INFO};
-use sp_transaction_pool::{TransactionPool, TransactionPoolMaintainer};
+use promet::prometheus_gauge;
 use sp_blockchain;
 use prometheus_endpoint::{create_gauge, Gauge, U64, F64};
 

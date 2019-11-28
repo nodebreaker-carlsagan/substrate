@@ -11486,5 +11486,9 @@ dependencies = [
 "checksum zeroize_derive 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de251eec69fc7c1bc3923403d18ececb929380e016afe103da75f396704f8ca2"
 "checksum zstd 0.5.1+zstd.1.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "5c5d978b793ae64375b80baf652919b148f6a496ac8802922d9999f5a553194f"
 "checksum zstd-safe 2.0.3+zstd.1.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "bee25eac9753cfedd48133fa1736cbd23b774e253d89badbeac7d12b23848d3f"
+<<<<<<< HEAD
 "checksum zstd-sys 1.4.15+zstd.1.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "89719b034dc22d240d5b407fb0a3fe6d29952c181cff9a9f95c0bd40b4f8f7d8"
 >>>>>>> 40762b683... Refactor rebase master prometheus_v0.3
+=======
+"checksum zstd-sys 1.4.15+zstd.1.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "89719b034dc22d240d5b407fb0a3fe6d29952c181cff9a9f95c0bd40b4f8f7d8"
+>>>>>>> 7d9d341eb... Refactor rebase master prometheus_v0.3
