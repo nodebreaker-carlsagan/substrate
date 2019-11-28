@@ -51,7 +51,11 @@ use std::{
 use wasm_timer::SystemTime;
 use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use sc_telemetry::{telemetry, SUBSTRATE_INFO};
+<<<<<<< HEAD
 use sp_transaction_pool::MaintainedTransactionPool;
+=======
+use promet::prometheus_gauge;
+>>>>>>> 40762b683... Refactor rebase master prometheus_v0.3
 use sp_blockchain;
 use grafana_data_source::{self, record_metrics};
 
@@ -997,6 +1001,17 @@ ServiceBuilder<
 			let memory_transaction_pool = parity_util_mem::malloc_size(&*transaction_pool_);
 			#[cfg(target_os = "unknown")]
 			let memory_transaction_pool = 0;
+			prometheus_gauge!(
+				MEMPOOL_SIZE => used_state_cache_size as u64,
+				NODE_MEMORY => memory as u64,
+				NODE_CPU => cpu_usage as u64,
+				TX_COUNT => txpool_status.ready as u64,
+				FINALITY_HEIGHT => finalized_number as u64,
+				BEST_HEIGHT => best_number as u64,
+				P2P_PEERS_NUM => num_peers as u64,
+				P2P_NODE_DOWNLOAD => net_status.average_download_per_sec as u64,
+				P2P_NODE_UPLOAD => net_status.average_upload_per_sec as u64
+			  );
 			let _ = record_metrics!(
 				"peers" => num_peers,
 				"height" => best_number,
@@ -1167,7 +1182,12 @@ ServiceBuilder<
 			).map(drop)), From::from("telemetry-worker")));
 			telemetry
 		});
-
+		match config.prometheus_endpoint {
+			None => (),
+			Some(x) => {
+				let _prometheus = promet::init_prometheus(x);
+			}
+		}
 		// Grafana data source
 		if let Some(port) = config.grafana_port {
 			let future = select(

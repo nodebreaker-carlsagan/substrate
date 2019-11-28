@@ -652,9 +652,15 @@ where
 		config.telemetry_endpoints = Some(TelemetryEndpoints::new(cli.telemetry_endpoints));
 	}
 
-	config.tracing_targets = cli.import_params.tracing_targets.into();
-	config.tracing_receiver = cli.import_params.tracing_receiver.into();
-
+	config.tracing_targets = cli.tracing_targets.into();
+	config.tracing_receiver = cli.tracing_receiver.into();
+	
+	match cli.prometheus_endpoint {
+		None => {config.prometheus_endpoint = None;},
+		Some(x) => {
+			config.prometheus_endpoint = Some(parse_address(&format!("{}:{}", x, 33333), cli.prometheus_port)?);
+			}
+	}
 	// Imply forced authoring on --dev
 	config.force_authoring = cli.shared_params.dev || cli.force_authoring;
 
