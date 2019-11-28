@@ -18,6 +18,7 @@ sp-runtime = {  path = "../../primitives/runtime" }
 consensus_common = { package = "sp-consensus", path = "../../primitives/consensus/common" }
 primitives = { package = "sp-core",  path = "../../primitives/core" }
 sc-telemetry = { path = "../telemetry" }
+sc-prometheus = { path = "../prometheus" }
 keystore = { package = "sc-keystore", path = "../keystore" }
 serde_json = "1.0.41"
 client-api = { package = "sc-client-api", path = "../api" }

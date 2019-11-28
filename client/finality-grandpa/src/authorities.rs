@@ -250,7 +250,6 @@ where
 		where F: Fn(&H, &H) -> Result<bool, E>,
 	{
 		let mut new_set = None;
-
 		for change in self.pending_forced_changes.iter()
 			.take_while(|c| c.effective_number() <= best_number) // to prevent iterating too far
 			.filter(|c| c.effective_number() == best_number)
