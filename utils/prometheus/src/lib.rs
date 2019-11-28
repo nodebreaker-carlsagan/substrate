@@ -22,13 +22,13 @@ use hyper::http::StatusCode;
 use hyper::Server;
 use hyper::{Body, Request, Response, service::{service_fn, make_service_fn}};
 pub use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
-pub use prometheus::{Histogram, IntCounter, IntGauge};
+pub use prometheus::{IntGaugeVec,Histogram, IntCounter, IntGauge};
 pub use sp_runtime::traits::SaturatedConversion;
 use std::net::SocketAddr;
-//#[cfg(not(target_os = "unknown"))]
-//mod networking;
+use std::collections::HashMap;
 
 pub mod metrics;
+pub mod expansion;
 
 #[derive(Debug, derive_more::Display, derive_more::From)]
 pub enum Error {
@@ -51,6 +51,7 @@ impl std::error::Error for Error {
 
 async fn request_metrics(req: Request<Body>) -> Result<Response<Body>, Error> {
   if req.uri().path() == "/metrics" {
+	expansion::resource_metrics();
     let metric_families = prometheus::gather();
     let mut buffer = vec![];
     let encoder = TextEncoder::new();
@@ -87,7 +88,7 @@ impl<T> hyper::rt::Executor<T> for Executor
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
 #[cfg(not(target_os = "unknown"))]
-pub  async fn init_prometheus(mut prometheus_addr: SocketAddr) -> Result<(), Error>{
+pub async fn init_prometheus(mut prometheus_addr: SocketAddr) -> Result<(), Error>{
   use async_std::{net, io};
   use grafana_data_source::networking::Incoming;
 	let listener = loop {

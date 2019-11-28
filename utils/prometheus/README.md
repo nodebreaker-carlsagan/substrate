@@ -10,6 +10,7 @@ Hack Prometheus in Substrate
  - Prometheus starter
  - CLI Config
  - Metrics Add
+ - expansion Add 
 
 Metrics
  - List of available metrics
@@ -43,6 +44,7 @@ pub use sp_runtime::traits::SaturatedConversion;
 use std::net::SocketAddr;
 
 pub mod metrics;
+pub mod expansion;
 
 #[derive(Debug, derive_more::Display, derive_more::From)]
 pub enum Error {
@@ -65,6 +67,7 @@ impl std::error::Error for Error {
 
 async fn request_metrics(req: Request<Body>) -> Result<Response<Body>, Error> {
   if req.uri().path() == "/metrics" {
+	expansion::resource_metrics();
     let metric_families = prometheus::gather();
     let mut buffer = vec![];
     let encoder = TextEncoder::new();
@@ -195,14 +198,21 @@ description = "prometheus utils"
 edition = "2018"
 
 [dependencies]
+sysinfo = "0.10.2"
 hyper = { version = "0.13.1", default-features = false, features = ["stream"] }
 lazy_static = "1.4"
 log = "0.4.8"
+tokio = "0.2"
 prometheus = { version = "0.7", features = ["nightly", "process"]}
 tokio = "0.2"
 futures-util = { version = "0.3.1", default-features = false, features = ["io"] }
 sp-runtime = { package = "sp-runtime",path = "../../primitives/runtime" }
+fg-primitives = { package = "sp-finality-grandpa", path = "../../primitives/finality-grandpa" }
+sp-core = { package = "sp-core",path = "../../primitives/core" }
+grandpa = { package = "finality-grandpa", version = "0.10.1", features = ["derive-codec"] }
 derive_more = "0.99"
+
+
 
 [target.'cfg(not(target_os = "unknown"))'.dependencies]
 async-std = { version = "1.0.1", features = ["unstable"] }
@@ -364,6 +374,7 @@ impl<C, G, E> Configuration<C, G, E> where
 
 
 
+
 ### Metrics Add 
 ex) consensus_FINALITY_HEIGHT
 
@@ -402,7 +413,7 @@ client/service/Cargo.toml
 sc-prometheus = { package = "sc-prometheus", path="../../utils/prometheus"}
 ...
 ```
-client/service/src/builder.rs
+utils/service/src/builder.rs
 ```rust
 .....
 use sc-prometheus::{prometheus_gauge};
@@ -460,6 +471,99 @@ use sc-prometheus::{prometheus_gauge};
 				);
 .....
 ```
+
+### Expansion Metrics
+
+utils/prometheus/src/expansion.rs
+```rust
+pub use crate::*;
+
+use fg_primitives::{AuthorityId, AuthoritySignature};
+use sp_core::crypto::Ss58Codec;
+use sp_runtime::traits::{Block as BlockT, NumberFor};
+use sysinfo::{NetworkExt, System, SystemExt, DiskExt, ProcessorExt};
+use std::{thread,time};
+
+type Blockcast<Block> =
+    grandpa::CatchUp<<Block as BlockT>::Hash, NumberFor<Block>, AuthoritySignature, AuthorityId>;
+
+pub struct Message<Block: BlockT> {
+    /// The compact commit message.
+    pub message: Blockcast<Block>,
+}
+
+pub fn full_message_metrics<Block: BlockT>(
+    message: &Blockcast<Block>,
+    authorities: Vec<AuthorityId>,
+) {
+    //let block_number = &message.base_number.clone().saturated_into().to_string();
+
+    let authorityid_list = authorities.iter();
+    for authorityid in authorityid_list {
+        let mut labels = std::collections::HashMap::new();
+        let mut _authorityid = &authorityid.clone().to_ss58check();
+        labels.insert("validator_address", _authorityid as &str);
+        //labels.insert("block_num", block_number as &str);
+        metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PREVOTE, &labels, 0);
+        metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PRECOMMIT, &labels, 0);
+    }
+
+    let prevote_list = message.prevotes.iter();
+    for prevoteid in prevote_list {
+        let mut labels = std::collections::HashMap::new();
+        let mut _prevoteid = &prevoteid.id.clone().to_ss58check();
+        labels.insert("validator_address", _prevoteid as &str);
+        //labels.insert("block_num", block_number as &str);
+        metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PREVOTE, &labels, 1);
+    }
+
+    let precommit_list = message.precommits.iter();
+    for precommitid in precommit_list {
+        let mut labels = std::collections::HashMap::new();
+        let mut _precommitid = &precommitid.id.clone().to_ss58check();
+        labels.insert("validator_address", _precommitid as &str);
+        //labels.insert("block_num", block_number as &str);
+        metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PRECOMMIT, &labels, 1);
+    }
+}
+
+pub fn resource_metrics() {
+    let mut sys = System::new();
+    let ten_millis = time::Duration::from_millis(500);
+    thread::sleep(ten_millis);
+    sys.refresh_all();
+    let cpu_use = (sys.get_processor_list()[0].get_cpu_usage() * 100.0).round() as u64;
+    metrics::set_gauge(&metrics::RESOURCE_CPU_USE, cpu_use);
+    println!("use: {:?}", cpu_use);
+
+    for disk in sys.get_disks() {
+        let mount_point = disk.get_mount_point().to_str().unwrap();
+        let used_disk = disk.get_total_space() - disk.get_available_space();
+        let mut labels = std::collections::HashMap::new();
+        labels.insert("mount_point", mount_point);
+        metrics::set_vecgauge(&metrics::RESOURCE_DISK_USE, &labels, used_disk as u64);
+    }
+    // Prometheus usage
+    metrics::set_gauge(&metrics::RESOURCE_RECEIVE_BYTES, sys.get_network().get_income() as u64);
+    metrics::set_gauge(&metrics::RESOURCE_SENT_BYTES, sys.get_network().get_outcome() as u64);
+    metrics::set_gauge(&metrics::RESOURCE_RAM_USE , sys.get_used_memory() as u64);
+    metrics::set_gauge(&metrics::RESOURCE_SWAP_USE , sys.get_used_swap() as u64);
+}
+
+```
+
+client/finality-grandpa/src/communication/gossip.rs:L813
+```rust
++ use sc_prometheus::{expansion};
+
++ expansion::full_message_metrics::<Block>(&full.message.clone(),self.authorities.clone());
+```
+client/finality-grandpa/Cargo.toml
+```rust
++ sc-prometheus = { path = "../../utils/prometheus" }
+```
+
+
 ## Metrics
 
 substrate can report and serve the Prometheus metrics, which in their turn can be consumed by Prometheus collector(s).
@@ -486,12 +590,15 @@ Consensus metrics, namespace: `substrate`
 | p2p_peers_number                       | IntGauge  |          | Number of peers node's connected to                             |
 | p2p_peer_receive_bytes_per_sec         | IntGauge  |          | number of bytes received from a given peer                      |
 | p2p_peer_send_bytes_per_sec            | IntGauge  |          | number of bytes sent to a given peer                            |
-| Resource_receive_bytes_per_sec(Future) | IntGauge  |          | Operating System of bytes received                              |
-| Resource_send_bytes_per_sec(Future)    | IntGauge  |          | Operating System of bytes sent                                  |
-| Resource_cpu_use(Future)               | IntGauge  |          | Operating System cpu load                                       |
-| Resource_disk_use(Future)              | IntGauge  |          | Operating System disk use                                       |
-| validator_sign_prevote(Future)         | IntGauge  | validator addr | validator sign vote list                               	  |
-| validator_sign_precommit(Future)       | IntGauge  | validator addr | validator sign commit list                                |
+| mempool_size                           | IntGauge  |          | Number of uncommitted transactions                              |
+| Resource_receive_bytes_per_sec | IntGauge  |          | Operating System of bytes received                              |
+| Resource_send_bytes_per_sec    | IntGauge  |          | Operating System of bytes sent                                  |
+| Resource_cpu_use              | IntGauge  |          | Operating System cpu load                                       |
+| Resource_disk_use             | IntGauge  |          | Operating System disk use                                      |
+| Resource_memory_use            | IntGauge  |          | Operating System memory use                                      |
+| Resource_swap_use              | IntGauge  |          | Operating System swap memory use                                      |
+| validator_sign_prevote        | IntGauge  | validator addr | validator sign vote list                               	  |
+| validator_sign_precommit      | IntGauge  | validator addr | validator sign commit list                                |
 
 
 ## Start Prometheus
@@ -553,3 +660,8 @@ You can visit `http://localhost:3000/` to open grafana and create your own dashb
 ### Seting Grafana
 
 Default ID:PW is admin.
+
+Samples(dashboard-export.json import), Prometheus Node IPs must be set directly from the panel.
+
+ex)
+![grants](./dashboard.PNG)

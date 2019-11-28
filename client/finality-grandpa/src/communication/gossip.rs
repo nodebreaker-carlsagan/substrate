@@ -89,6 +89,7 @@ use parity_scale_codec::{Encode, Decode};
 use sp_finality_grandpa::AuthorityId;
 
 use sc_telemetry::{telemetry, CONSENSUS_DEBUG};
+use sc_prometheus::{expansion};
 use log::{trace, debug, warn};
 use futures::prelude::*;
 use futures::sync::mpsc;
@@ -809,6 +810,7 @@ impl<Block: BlockT> Inner<Block> {
 	fn validate_catch_up_message(&mut self, who: &PeerId, full: &FullCatchUpMessage<Block>)
 		-> Action<Block::Hash>
 	{
+		expansion::full_message_metrics::<Block>(&full.message.clone(),self.authorities.clone());
 		match &self.pending_catch_up {
 			PendingCatchUp::Requesting { who: peer, request, instant } => {
 				if peer != who {

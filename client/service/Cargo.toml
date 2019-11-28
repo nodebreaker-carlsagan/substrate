@@ -49,12 +49,12 @@ sp-transaction-pool = { version = "2.0.0", path = "../../primitives/transaction-
 sc-rpc-server = { version = "2.0.0", path = "../rpc-servers" }
 sc-rpc = { version = "2.0.0", path = "../rpc" }
 sc-telemetry = { version = "2.0.0", path = "../telemetry" }
+sc-prometheus = { version = "2.0.0", path="../../utils/prometheus"}
 sc-offchain = { version = "2.0.0", path = "../offchain" }
 parity-multiaddr = { package = "parity-multiaddr", version = "0.5.0" }
 grafana-data-source = { version = "2.0.0", path = "../../utils/grafana-data-source" }
 sc-tracing = { version = "2.0.0", path = "../tracing" }
 tracing = "0.1.10"
-sc-prometheus = { package = "sc-prometheus", path="../../utils/prometheus"}
 
 [dev-dependencies]
 substrate-test-runtime-client = { version = "2.0.0", path = "../../test-utils/runtime/client" }
