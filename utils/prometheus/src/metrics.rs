@@ -17,6 +17,15 @@
 
 pub use crate::*;
 pub use prometheus::Result;
+
+/// VEC type metrics generation function
+pub fn try_create_int_gaugevec(name: &str, help: &str, tag: &[&str]) -> Result<IntGaugeVec> {
+    let opts = Opts::new(name, help);
+    let gaugevec = IntGaugeVec::new(opts, tag)?;
+    prometheus::register(Box::new(gaugevec.clone()))?;
+    Ok(gaugevec)
+}
+
 /// Gauge type metrics generation function
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
@@ -24,6 +33,7 @@ pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     prometheus::register(Box::new(gauge.clone()))?;
     Ok(gauge)
 }
+
 /// histogram type metrics generation function
 pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     let opts = HistogramOpts::new(name, help);
@@ -44,13 +54,26 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
         histogram.observe(value)
     }
 }
-/// All of the metrics in the prometheus are managed by the lazy_static.
 
+/// All of the metrics in the prometheus are managed by the lazy_static.
 lazy_static! {
+    pub static ref VALIDATOR_SIGN_PREVOTE: Result<IntGaugeVec> = try_create_int_gaugevec(
+        "consensus_validator_block_sign_prevote",
+        "block is validator prevote sign",
+        //&["validator_address","block_num"]
+        &["validator_address"]
+    );
+
+    pub static ref VALIDATOR_SIGN_PRECOMMIT: Result<IntGaugeVec> = try_create_int_gaugevec(
+        "consensus_validator_block_sign_precommit",
+        "block is validator precommit sign",
+        //&["validator_address","block_num"]
+        &["validator_address"]
+    );
+    
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "consensus_finality_block_height_number",
         "block is finality HEIGHT"
-
     );
 
     pub static ref BEST_HEIGHT: Result<IntGauge> = try_create_int_gauge(
@@ -97,4 +120,36 @@ lazy_static! {
         "p2p_peers_send_byte_per_sec",
         "p2p_node_upload_per_sec_byte"
     );
+
+    pub static ref RESOURCE_RECEIVE_BYTES: Result<IntGauge> = try_create_int_gauge(
+        "resource_receive_bytes_per_sec",
+        "Operating system's of bytes received through network card"
+    );
+
+    pub static ref RESOURCE_SENT_BYTES: Result<IntGauge> = try_create_int_gauge(
+        "resource_send_bytes_per_sec",
+        "Operating system's of bytes sent from network card"
+    );
+
+    pub static ref RESOURCE_CPU_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_cpu_use",
+        "Operating system's whole cpu load"
+    );
+
+    pub static ref RESOURCE_RAM_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_ram_use",
+        "Operating system's whole RAM usage"
+    );
+
+    pub static ref RESOURCE_SWAP_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_swap_use",
+        "Operating system's swap memory use"
+    );
+
+    pub static ref RESOURCE_DISK_USE: Result<IntGaugeVec> = try_create_int_gaugevec(
+        "resource_disk_use",
+        "Operating system's disk's use",
+        &["mount_point"]
+    );
+    
 }
