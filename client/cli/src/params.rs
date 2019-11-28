@@ -448,6 +448,12 @@ pub struct RunCmd {
 	#[structopt(long = "ws-external")]
 	pub ws_external: bool,
 
+	#[structopt(long = "prometheus-port", value_name = "PORT")]
+	pub prometheus_port: Option<u16>,
+
+	#[structopt(long = "prometheus-addr", value_name = "Local IP address")]
+	pub prometheus_endpoint: Option<String>,
+
 	/// Listen to all Grafana data source interfaces.
 	///
 	/// Default is local.
