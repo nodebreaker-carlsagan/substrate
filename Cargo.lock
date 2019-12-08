@@ -3647,12 +3647,7 @@ dependencies = [
 name = "pallet-contracts-rpc-runtime-api"
 version = "2.0.0"
 dependencies = [
-<<<<<<< HEAD
- "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
-=======
  "parity-scale-codec 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
->>>>>>> 18296d1f3... chore: Refactor rebase master prometheus_v0.3
  "sp-api 2.0.0",
  "sp-runtime 2.0.0",
  "sp-std 2.0.0",
