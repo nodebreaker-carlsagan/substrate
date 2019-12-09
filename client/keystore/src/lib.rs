@@ -342,7 +342,7 @@ mod tests {
 
 		let pair: ed25519::AppPair = store
 			.write()
-			.insert_ephemeral_from_seed("0x3d97c819d68f9bafa7d6e79cb991eebcd77d966c5334c0b94d9e1fa7ad0869dc")
+			.insert_ephemeral_from_seed("0x4a22a2403587a47cfb1f62228ca880c0dd6d075e39a3a3e95dac79f9ca91c959")
 			.unwrap();
 		assert_eq!(
 			"5DKUrgFqCPV8iAXx9sjy1nyBygQCeiUYRFWurZGhnrn3HJCA",

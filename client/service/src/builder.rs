@@ -1035,6 +1035,8 @@ ServiceBuilder<
 				(chain, state)
 			};
 
+			let state_1 = rpc::state::new_full(client.clone(), subscriptions.clone());
+			let state_2 = &state_1;
 			let author = rpc::author::Author::new(
 				client.clone(),
 				transaction_pool.clone(),

@@ -2,6 +2,7 @@
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
+use babe_primitives::{Epoch, AuthorityId, BabeAuthorityWeight};
 use hyper::http::StatusCode;
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
@@ -13,6 +14,17 @@ use std::net::SocketAddr;
 
 pub mod metrics;
 
+//pub fn qwer123(
+//	authorities: &[(AuthorityId, BabeAuthorityWeight)],
+//){
+//	let _theta =	authorities.iter();
+
+//}
+
+pub fn validators_met(epoch: &Epoch){
+  let _threshold = &epoch.authorities;
+	//let _threshold = qwer123(&epoch.authorities,);
+}
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
 pub fn init_prometheus(prometheus_addr: SocketAddr) {

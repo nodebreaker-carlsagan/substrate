@@ -12,6 +12,7 @@ log = "0.4"
 prometheus = { version = "0.7", features = ["nightly", "process"]}
 tokio = "0.1"
 sp-runtime = { path = "../../primitives/sr-primitives" }
+babe_primitives = { package = "sp-consensus-babe", path = "../../primitives/consensus/babe" }
 
 [dev-dependencies]
 reqwest = "0.9"
