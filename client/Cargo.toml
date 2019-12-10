@@ -31,7 +31,7 @@ state-machine = { package = "sp-state-machine", path = "../primitives/state-mach
 sc-telemetry = { path = "telemetry" }
 trie = { package = "sp-trie", path = "../primitives/trie" }
 tracing = "0.1.10"
-substrate-prometheus = { path = "prometheus" }
+sc-prometheus = { path = "prometheus" }
 
 [dev-dependencies]
 env_logger = "0.7.0"

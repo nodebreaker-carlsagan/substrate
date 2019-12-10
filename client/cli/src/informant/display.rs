@@ -21,7 +21,7 @@ use network::SyncState;
 use sp_runtime::traits::{Block as BlockT, CheckedDiv, NumberFor, Zero, Saturating};
 use service::NetworkStatus;
 use std::{convert::{TryFrom, TryInto}, fmt, time};
-use substrate_prometheus::prometheus_gauge;
+use sc_prometheus::prometheus_gauge;
 /// State of the informant display system.
 ///
 /// This is the system that handles the line that gets regularly printed and that looks something
