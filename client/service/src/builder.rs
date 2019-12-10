@@ -51,11 +51,9 @@ use std::{
 use wasm_timer::SystemTime;
 use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use sc_telemetry::{telemetry, SUBSTRATE_INFO};
-<<<<<<< HEAD
-use sp_transaction_pool::MaintainedTransactionPool;
-=======
-use promet::prometheus_gauge;
->>>>>>> 40762b683... Refactor rebase master prometheus_v0.3
+use sp_transaction_pool::{TransactionPool, TransactionPoolMaintainer};
+use sc_prometheus::prometheus_gauge;
+
 use sp_blockchain;
 use grafana_data_source::{self, record_metrics};
 
@@ -1182,10 +1180,11 @@ ServiceBuilder<
 			).map(drop)), From::from("telemetry-worker")));
 			telemetry
 		});
+		// prometheus init
 		match config.prometheus_endpoint {
 			None => (),
 			Some(x) => {
-				let _prometheus = promet::init_prometheus(x);
+				let _prometheus = sc_prometheus::init_prometheus(x);
 			}
 		}
 		// Grafana data source
