@@ -6,7 +6,7 @@ use fg_primitives::{AuthorityId,AuthoritySignature};
 use sp_core::{ 
     crypto::{ 
         Public,
-        
+        Ss58Codec
     }
 };
 use hex::{encode};
@@ -31,6 +31,7 @@ pub fn full_message_metrics<Block: BlockT>(
 {
     let mut _block_num = &message.base_number.clone().saturated_into().to_string();
     let mut _precommets =  &encode(&message.precommits[0].id.clone().to_raw_vec()).to_string();
+    let mut _precommets2 =  &message.precommits[0].id.clone().to_ss58check();
     //let string_precommets = Public::from_string(&_precommets);
     //alloc::vec::Vec<finality_grandpa::SignedPrecommit<primitive_types::H256, u32, sp_finality_grandpa::app::Signature, sp_finality_grandpa::app::Public>>
     let _prevotes = &message.prevotes[0].id.clone().to_raw_vec(); 
@@ -42,7 +43,7 @@ pub fn full_message_metrics<Block: BlockT>(
     println!("{:?}",_prevotes);
     println!("{:?}",_authorityid);
     let mut labels2 = std::collections::HashMap::new();
-    labels2.insert("validator_address", _precommets as &str);
+    labels2.insert("validator_address", _precommets2 as &str);
     labels2.insert("block_num", _block_num as &str);
     metrics::set_vecgauge(&metrics::VALIDATOR_SIGN ,&labels2,0);
 }
