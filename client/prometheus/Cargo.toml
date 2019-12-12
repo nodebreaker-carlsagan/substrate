@@ -9,8 +9,9 @@ edition = "2018"
 hyper = "0.12"
 lazy_static = "1.0"
 log = "0.4"
-prometheus = { version = "0.7", features = ["nightly", "process"]}
+hex = "0.4.0"
 tokio = "0.1"
+prometheus = { version = "0.7", features = ["nightly", "process"]}
 sp-runtime = { package = "sp-runtime",path = "../../primitives/runtime" }
 fg-primitives = { package = "sp-finality-grandpa", path = "../../primitives/finality-grandpa" }
 sp-core = { package = "sp-core",path = "../../primitives/core" }
