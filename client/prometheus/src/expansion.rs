@@ -1,29 +1,35 @@
 pub use crate::*;
 
-//use sp_runtime::traits::{NumberFor, Block as BlockT};
+use sp_runtime::traits::{NumberFor, Block as BlockT};
 use fg_primitives::{AuthorityId,AuthoritySignature};
-use sp_core::{
-    crypto::{ Public } ,H256
-};
-use grandpa::{
-    SignedPrevote, SignedPrecommit,Prevote
-};
+//sp_finality_grandpa::app::Signature, sp_finality_grandpa::app::Public is to_raw_vec()
+use sp_core::{ crypto::{ Public }};
 
 
-pub fn full_message_metrics(
-    //prevote_list: &Vec<T>,
-    prevote_list: &Vec<SignedPrevote< Prevote<H256,u32>, u32,AuthoritySignature, AuthorityId>>,
-    precommet_list: &Vec<SignedPrecommit<H256, u32, AuthoritySignature, AuthorityId>>,
-    base_num: u32,
-    authorities: AuthorityId
+type Blockcast<Block> = grandpa::CatchUp<
+	<Block as BlockT>::Hash,
+	NumberFor<Block>,
+	AuthoritySignature,
+	AuthorityId,
+>;
+
+pub struct Message<Block: BlockT> {
+	/// The compact commit message.
+	pub message: Blockcast<Block>,
+}
+
+
+pub fn full_message_metrics<Block: BlockT>(
+    message: &Blockcast<Block>,
+    authorities: Vec<AuthorityId>
 )
 {
-    let _block_num = base_num;
-    let _precommets =  precommet_list.clone();
+    let _block_num = &message.base_number.clone();
+    let _precommets =  &message.precommits[0].id.clone().to_raw_vec();
     //alloc::vec::Vec<finality_grandpa::SignedPrecommit<primitive_types::H256, u32, sp_finality_grandpa::app::Signature, sp_finality_grandpa::app::Public>>
-    let _prevotes = prevote_list.clone(); 
+    let _prevotes = &message.prevotes[0].id.clone().to_raw_vec(); 
     //alloc::vec::Vec<finality_grandpa::SignedPrevote<primitive_types::H256, u32, sp_finality_grandpa::app::Signature, sp_finality_grandpa::app::Public>>
-    let _authorityid  = authorities.clone().to_raw_vec();
+    let _authorityid  = authorities[0].clone().to_raw_vec();
     //alloc::vec::Vec<sp_finality_grandpa::app::Public>
     println!("{:?}",_block_num);
     println!("{:?}",_precommets);

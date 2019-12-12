@@ -54,7 +54,6 @@ use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use tel::{telemetry, SUBSTRATE_INFO};
 use sp_transaction_pool::{TransactionPool, TransactionPoolMaintainer};
 use sc_prometheus::prometheus_gauge;
-use sc_prometheus::metrics;
 use sp_blockchain;
 use grafana_data_source::{self, record_metrics};
 
