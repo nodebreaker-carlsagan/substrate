@@ -43,9 +43,14 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
 }
 //All of the metrics in the prometheus are managed by the lazy_static.
 lazy_static! {
-    pub static ref VALIDATOR_SIGN: Result<IntGaugeVec> = try_create_int_gaugevec(
-        "consensus_validator_block_sign",
-        "block is validator sign",
+    pub static ref VALIDATOR_SIGN_PREVOTE: Result<IntGaugeVec> = try_create_int_gaugevec(
+        "consensus_validator_block_sign_prevote",
+        "block is validator prevote sign",
+        &["validator_address","block_num"]
+    );
+    pub static ref VALIDATOR_SIGN_PRECOMMIT: Result<IntGaugeVec> = try_create_int_gaugevec(
+        "consensus_validator_block_sign_precommit",
+        "block is validator precommit sign",
         &["validator_address","block_num"]
     );
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
