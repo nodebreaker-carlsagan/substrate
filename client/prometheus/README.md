@@ -1,5 +1,5 @@
 # Substrate Prometheus Node Exporter
-
+![grants](./photo_2019-12-13_16-32-53.jpg)
 ## Introduction
 
 Prometheus is one of the most widely used monitoring tool for managing high availability services supported by [Cloud Native Computing Foundation](https://www.cncf.io/). By providing Prometheus exporter in substrate, node operators can easily adopt widely used display/alert tool such as Grafana without seting-up/operating external Prometheus agent through RPC connections. Easy access to such monitoring tools will benefit parachain develepers/operators and validators to have much higher availability quality of their services.
@@ -424,7 +424,7 @@ Consensus metrics, namespace: `substrate`
 | consensus_finality_block_height_number | IntGauge  |          | finality Height of the chain                                    |
 | consensus_best_block_height_number     | IntGauge  |          | best Height of the chain                                        |
 | consensus_target_syn_number            | IntGauge  |          | syning Height target number                                     |
-| consensus_block_interval_seconds       | Histogram |          | Time between this and last block (Block.Header.Time) in seconds |
+| consensus_block_interval_seconds(Future)| Histogram |         | Time between this and last block (Block.Header.Time) in seconds |
 | consensus_num_txs                      | Gauge     |          | Number of transactions                                          |
 | consensus_node_memory                  | IntGauge  |          | Node's primary memory                                           |
 | consensus_node_cpu                     | IntGauge  |          | Node's cpu load                                                 |
@@ -432,10 +432,12 @@ Consensus metrics, namespace: `substrate`
 | p2p_peer_receive_bytes_per_sec         | IntGauge  |          | number of bytes received from a given peer                      |
 | p2p_peer_send_bytes_per_sec            | IntGauge  |          | number of bytes sent to a given peer                            |
 | mempool_size                           | IntGauge  |          | Number of uncommitted transactions                              |
-| Resource_receive_bytes_per_sec(Future)         | IntGauge  |          | Operating System of bytes received                              |
-| Resource_send_bytes_per_sec(Future)            | IntGauge  |          | Operating System of bytes sent                                  |
-| Resource_cpu_use(Future)                       | IntGauge  |          | Operating System cpu load                                       |
-| validator_sign(Future)                         | IntGauge  | validator addr | validator sign list                                             |
+| Resource_receive_bytes_per_sec(Future) | IntGauge  |          | Operating System of bytes received                              |
+| Resource_send_bytes_per_sec(Future)    | IntGauge  |          | Operating System of bytes sent                                  |
+| Resource_cpu_use(Future)               | IntGauge  |          | Operating System cpu load                                       |
+| Resource_disk_use(Future)               | IntGauge  |          | Operating System disk use                                      |
+| validator_sign_prevote(Future)         | IntGauge  | validator addr | validator sign vote list                               	  |
+| validator_sign_precommit(Future)       | IntGauge  | validator addr | validator sign commit list                                |
 
 
 ## Start Prometheus
