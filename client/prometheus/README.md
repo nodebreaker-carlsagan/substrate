@@ -435,7 +435,9 @@ Consensus metrics, namespace: `substrate`
 | Resource_receive_bytes_per_sec(Future) | IntGauge  |          | Operating System of bytes received                              |
 | Resource_send_bytes_per_sec(Future)    | IntGauge  |          | Operating System of bytes sent                                  |
 | Resource_cpu_use(Future)               | IntGauge  |          | Operating System cpu load                                       |
-| Resource_disk_use(Future)               | IntGauge  |          | Operating System disk use                                      |
+| Resource_disk_use(Future)              | IntGauge  |          | Operating System disk use                                      |
+| Resource_memory_use(Future)            | IntGauge  |          | Operating System memory use                                      |
+| Resource_swap_use(Future)              | IntGauge  |          | Operating System swap use                                      |
 | validator_sign_prevote(Future)         | IntGauge  | validator addr | validator sign vote list                               	  |
 | validator_sign_precommit(Future)       | IntGauge  | validator addr | validator sign commit list                                |
 

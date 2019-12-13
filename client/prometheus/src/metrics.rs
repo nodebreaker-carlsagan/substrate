@@ -101,4 +101,8 @@ lazy_static! {
         "p2p_peers_send_byte_per_sec",
         "p2p_node_upload_per_sec_byte"
     );
+    pub static ref P2P_NODE_UPLOAD: Result<IntGauge> = try_create_int_gauge(
+        "p2p_peers_send_byte_per_sec",
+        "p2p_node_upload_per_sec_byte"
+    );
 }

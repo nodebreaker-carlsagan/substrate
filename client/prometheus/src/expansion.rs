@@ -3,6 +3,7 @@ pub use crate::*;
 use sp_runtime::traits::{NumberFor, Block as BlockT};
 use fg_primitives::{AuthorityId,AuthoritySignature};
 use sp_core::{  crypto::{ Ss58Codec }};
+use sysinfo::{NetworkExt, System, SystemExt};
 
 type Blockcast<Block> = grandpa::CatchUp<
 	<Block as BlockT>::Hash,
@@ -51,4 +52,36 @@ pub fn full_message_metrics<Block: BlockT>(
         //labels.insert("block_num", block_number as &str);
         metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PRECOMMIT ,&labels, 1);
     };
+}
+
+pub fn resource_metrics(){
+    let mut sys = System::new();
+
+    // We display the disks:
+    println!("=> disk list:");
+    for disk in sys.get_disks() {
+    println!("{:?}", disk);
+    }
+
+    // Network data:
+    println!("input data : {} B", sys.get_network().get_income());
+    println!("output data: {} B", sys.get_network().get_outcome());
+
+    // Components temperature:
+    for component in sys.get_components_list() {
+        println!("{:?}", component);
+    }
+
+    // Memory information:
+    println!("total memory: {} kB", sys.get_total_memory());
+    println!("used memory : {} kB", sys.get_used_memory());
+    println!("total swap  : {} kB", sys.get_total_swap());
+    println!("used swap   : {} kB", sys.get_used_swap());
+
+    // Number of processors
+    println!("NB processors: {}", sys.get_processor_list().len());
+    println!("uptime: {}", sys.get_uptime());
+    // To refresh all system information:
+    sys.refresh_network();
+    sys.refresh_all();
 }
