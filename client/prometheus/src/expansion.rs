@@ -22,14 +22,14 @@ pub fn full_message_metrics<Block: BlockT>(
 )
 {
 
-    let block_number = &message.base_number.clone().saturated_into().to_string();
+    //let block_number = &message.base_number.clone().saturated_into().to_string();
 
     let authorityid_list  = authorities.iter();
     for authorityid in authorityid_list{
         let mut labels = std::collections::HashMap::new();
         let mut _authorityid = &authorityid.clone().to_ss58check();
         labels.insert("validator_address", _authorityid as &str);
-        labels.insert("block_num", block_number as &str);
+        //labels.insert("block_num", block_number as &str);
         metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PREVOTE ,&labels, 0);
         metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PRECOMMIT ,&labels, 0);
     };
@@ -39,7 +39,7 @@ pub fn full_message_metrics<Block: BlockT>(
         let mut labels = std::collections::HashMap::new();
         let mut _prevoteid = &prevoteid.id.clone().to_ss58check();
         labels.insert("validator_address", _prevoteid as &str);
-        labels.insert("block_num", block_number as &str);
+        //labels.insert("block_num", block_number as &str);
         metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PREVOTE ,&labels, 1);
     };
 
@@ -48,7 +48,7 @@ pub fn full_message_metrics<Block: BlockT>(
         let mut labels = std::collections::HashMap::new();
         let mut _precommitid = &precommitid.id.clone().to_ss58check();
         labels.insert("validator_address", _precommitid as &str);
-        labels.insert("block_num", block_number as &str);
+        //labels.insert("block_num", block_number as &str);
         metrics::set_vecgauge(&metrics::VALIDATOR_SIGN_PRECOMMIT ,&labels, 1);
     };
 }

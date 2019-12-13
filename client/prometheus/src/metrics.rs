@@ -46,12 +46,14 @@ lazy_static! {
     pub static ref VALIDATOR_SIGN_PREVOTE: Result<IntGaugeVec> = try_create_int_gaugevec(
         "consensus_validator_block_sign_prevote",
         "block is validator prevote sign",
-        &["validator_address","block_num"]
+        //&["validator_address","block_num"]
+        &["validator_address"]
     );
     pub static ref VALIDATOR_SIGN_PRECOMMIT: Result<IntGaugeVec> = try_create_int_gaugevec(
         "consensus_validator_block_sign_precommit",
         "block is validator precommit sign",
-        &["validator_address","block_num"]
+        //&["validator_address","block_num"]
+        &["validator_address"]
     );
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "consensus_finality_block_height_number",
