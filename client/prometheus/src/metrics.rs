@@ -23,7 +23,7 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
-pub fn set_vecgauge(gaugevec: &Result<IntGaugeVec>, labels: &HashMap<&str,&str> ,value: u64) {
+pub fn set_vecgauge(gaugevec: &Result<IntGaugeVec>, labels: &HashMap<&str, &str>, value: u64) {
     if let Ok(gaugevec) = gaugevec {
         gaugevec.with(&labels).set(value as i64);
     }
@@ -101,8 +101,24 @@ lazy_static! {
         "p2p_peers_send_byte_per_sec",
         "p2p_node_upload_per_sec_byte"
     );
-    pub static ref P2P_NODE_UPLOAD: Result<IntGauge> = try_create_int_gauge(
-        "p2p_peers_send_byte_per_sec",
-        "p2p_node_upload_per_sec_byte"
+    pub static ref RESOURCE_RECEIVE_BYTES: Result<IntGauge> = try_create_int_gauge(
+        "resource_receive_bytes_per_sec",
+        "Operating system's of bytes received through network card"
+    );
+    pub static ref RESOURCE_SENT_BYTES: Result<IntGauge> = try_create_int_gauge(
+        "resource_send_bytes_per_sec",
+        "Operating system's of bytes sent from network card"
+    );
+    pub static ref RESOURCE_CPU_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_cpu_use",
+        "Operating system's whole cpu load"
+    );
+    pub static ref RESOURCE_RAM_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_cpu_use",
+        "Operating system's whole RAM usage"
+    );
+    pub static ref RESOURCE_SWAP_USE: Result<IntGauge> = try_create_int_gauge(
+        "resource_swap_use",
+        "Operating system's swap memory use"
     );
 }
