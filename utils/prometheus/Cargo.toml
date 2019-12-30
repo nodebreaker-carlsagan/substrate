@@ -6,12 +6,9 @@ description = "prometheus utils"
 edition = "2018"
 
 [dependencies]
-hyper = "0.12"
-lazy_static = "1.0"
-log = "0.4"
+hyper = "0.13.1" 
+lazy_static = "1.4"
+log = "0.4.8"
 prometheus = { version = "0.7", features = ["nightly", "process"]}
-tokio = "0.1"
+tokio = "0.2.4"
 sp-runtime = { package = "sp-runtime",path = "../../primitives/runtime" }
-
-[dev-dependencies]
-reqwest = "0.9"

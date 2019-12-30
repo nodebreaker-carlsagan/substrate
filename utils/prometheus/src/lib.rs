@@ -46,7 +46,7 @@ pub fn init_prometheus(prometheus_addr: SocketAddr) {
   info!("Exporting metrics at http://{}/metrics", addr);
 
   let mut rt = tokio::runtime::Builder::new()
-    .core_threads(1) // one thread is sufficient
+    .num_threads(1) // one thread is sufficient
     .build()
     .expect("Builds one thread of tokio runtime exporter for prometheus");
 
