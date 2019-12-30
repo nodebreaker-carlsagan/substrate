@@ -16,6 +16,7 @@
 
 //! Substrate service. Starts a thread that spins up the network, client, and extrinsic pool.
 //! Manages communication between them.
+#![warn(missing_docs)]
 
 pub mod config;
 #[macro_use]
