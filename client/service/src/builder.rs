@@ -1119,7 +1119,14 @@ ServiceBuilder<
 		match config.prometheus_endpoint {
 			None => (),
 			Some(x) => {
-				let _prometheus = sc_prometheus::init_prometheus(x);
+				let future = select(
+					sc_prometheus::init_prometheus(x).boxed()
+					,exit.clone()
+				).map(|either| match either {
+					Either::Left((_result, _)) => Ok(()),
+					Either::Right(_) => Ok(())
+				}).compat();
+				let _ = to_spawn_tx.unbounded_send(Box::new(future));
 			}
 		}
 		// Grafana data source

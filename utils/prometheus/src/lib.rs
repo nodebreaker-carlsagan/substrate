@@ -1,59 +1,112 @@
 #[macro_use]
 extern crate lazy_static;
-#[macro_use]
-extern crate log;
+use futures_util::{FutureExt,future::{Future}};
 use hyper::http::StatusCode;
-use hyper::rt::Future;
-use hyper::service::service_fn_ok;
-use hyper::{Body, Request, Response, Server};
+use hyper::Server;
+use hyper::{Body, Request, Response, service::{service_fn, make_service_fn}};
 pub use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
-pub use prometheus::{Histogram, IntCounter, IntGauge, Result};
+pub use prometheus::{Histogram, IntCounter, IntGauge};
 pub use sp_runtime::traits::SaturatedConversion;
 use std::net::SocketAddr;
-
+use std::convert::Infallible;
+#[cfg(not(target_os = "unknown"))]
+mod networking;
 pub mod metrics;
 
+#[derive(Debug, derive_more::Display, derive_more::From)]
+enum Error {
+	/// Hyper internal error.
+	Hyper(hyper::Error),
+	/// Http request error.
+	Http(hyper::http::Error),
+	/// i/o error.
+	Io(std::io::Error)
+}
+impl std::error::Error for Error {
+	fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+		match self {
+			Error::Hyper(error) => Some(error),
+			Error::Http(error) => Some(error),
+			Error::Io(error) => Some(error)
+		}
+	}
+}
+
+async fn request_metrics(req: Request<Body>) -> Result<Response<Body>, Error> {
+  if req.uri().path() == "/metrics" {
+    let metric_families = prometheus::gather();
+    let mut buffer = vec![];
+    let encoder = TextEncoder::new();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
+    Response::builder()
+      .status(StatusCode::OK)
+      .header("Content-Type", encoder.format_type())
+      .body(Body::from(buffer))
+      .map_err(Error::Http)
+      //.expect("Sends OK(200) response with one or more data metrics")
+  } else {
+    Response::builder()
+      .status(StatusCode::NOT_FOUND)
+      .body(Body::from("Not found."))
+      .map_err(Error::Http)
+      //.expect("Sends NOT_FOUND(404) message with no data metric")
+  }
+  
+}
+
+#[derive(Clone)]
+pub struct Executor;
+
+#[cfg(not(target_os = "unknown"))]
+impl<T> hyper::rt::Executor<T> for Executor
+	where
+		T: Future + Send + 'static,
+		T::Output: Send + 'static,
+{
+	fn execute(&self, future: T) {
+		async_std::task::spawn(future);
+	}
+}
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
-pub fn init_prometheus(prometheus_addr: SocketAddr) {
-  let addr = prometheus_addr;
-  let server = Server::bind(&addr)
-    .serve(|| {
-      // This is the `Service` that will handle the connection.
-      // `service_fn_ok` is a helper to convert a function that
-      // returns a Response into a `Service`.
-      service_fn_ok(move |req: Request<Body>| {
-        if req.uri().path() == "/metrics" {
-          let metric_families = prometheus::gather();
-          let mut buffer = vec![];
-          let encoder = TextEncoder::new();
-          encoder.encode(&metric_families, &mut buffer).unwrap();
-          Response::builder()
-            .status(StatusCode::OK)
-            .header("Content-Type", encoder.format_type())
-            .body(Body::from(buffer))
-            .expect("Sends OK(200) response with one or more data metrics")
-        } else {
-          Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body(Body::from("Not found."))
-            .expect("Sends NOT_FOUND(404) message with no data metric")
-        }
-      })
-    })
-    .map_err(|e| error!("server error: {}", e));
+#[cfg(not(target_os = "unknown"))]
+pub  async fn init_prometheus(mut prometheus_addr: SocketAddr){
+  use async_std::{net, io};
+  use crate::networking::Incoming;
 
-  info!("Exporting metrics at http://{}/metrics", addr);
+	let listener = loop {
+		let listener = net::TcpListener::bind(&prometheus_addr).await;
+		match listener {
+			Ok(listener) => {
+				log::info!("Prometheus server started at {}", prometheus_addr);
+				break listener
+			},
+			Err(err) => match err.kind() {
+				io::ErrorKind::AddrInUse | io::ErrorKind::PermissionDenied if prometheus_addr.port() != 0 => {
+					log::warn!(
+						"Prometheus server to already 33333 port.",
+					);
+					prometheus_addr.set_port(0);
+					continue;
+				},
+        _ => {
+          log::warn!("server error: {}", err);
+        },
+      }
+		}
+	};
+  let service = make_service_fn(|_| {
+		async {
+			Ok::<_, Infallible>(service_fn(request_metrics))
+		}
+	});
 
-  let mut rt = tokio::runtime::Builder::new()
-    .num_threads(1) // one thread is sufficient
-    .build()
-    .expect("Builds one thread of tokio runtime exporter for prometheus");
 
-  std::thread::spawn(move || {
-    rt.spawn(server);
-    rt.shutdown_on_idle().wait().unwrap();
-  });
+	let _server = Server::builder(Incoming(listener.incoming()))
+		.executor(Executor)
+		.serve(service)
+    .boxed();
+  
 }
 
 #[macro_export]

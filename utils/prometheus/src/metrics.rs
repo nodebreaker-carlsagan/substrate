@@ -1,5 +1,5 @@
 pub use crate::*;
-
+pub use prometheus::Result;
 /// Gauge type metrics generation function
 pub fn try_create_int_gauge(name: &str, help: &str) -> Result<IntGauge> {
     let opts = Opts::new(name, help);
