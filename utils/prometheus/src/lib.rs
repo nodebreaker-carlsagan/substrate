@@ -8,13 +8,12 @@ pub use prometheus::{Encoder, HistogramOpts, Opts, TextEncoder};
 pub use prometheus::{Histogram, IntCounter, IntGauge};
 pub use sp_runtime::traits::SaturatedConversion;
 use std::net::SocketAddr;
-use std::convert::Infallible;
 #[cfg(not(target_os = "unknown"))]
 mod networking;
 pub mod metrics;
 
 #[derive(Debug, derive_more::Display, derive_more::From)]
-enum Error {
+pub enum Error {
 	/// Hyper internal error.
 	Hyper(hyper::Error),
 	/// Http request error.
@@ -70,7 +69,7 @@ impl<T> hyper::rt::Executor<T> for Executor
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
 #[cfg(not(target_os = "unknown"))]
-pub  async fn init_prometheus(mut prometheus_addr: SocketAddr){
+pub  async fn init_prometheus(mut prometheus_addr: SocketAddr) -> Result<(), Error>{
   use async_std::{net, io};
   use crate::networking::Incoming;
 
@@ -84,20 +83,18 @@ pub  async fn init_prometheus(mut prometheus_addr: SocketAddr){
 			Err(err) => match err.kind() {
 				io::ErrorKind::AddrInUse | io::ErrorKind::PermissionDenied if prometheus_addr.port() != 0 => {
 					log::warn!(
-						"Prometheus server to already 33333 port.",
+						"Prometheus server to already {} port.", prometheus_addr.port()
 					);
 					prometheus_addr.set_port(0);
 					continue;
 				},
-        _ => {
-          log::warn!("server error: {}", err);
-        },
+        _ => return Err(err.into())
       }
 		}
 	};
   let service = make_service_fn(|_| {
 		async {
-			Ok::<_, Infallible>(service_fn(request_metrics))
+			Ok::<_, Error>(service_fn(request_metrics))
 		}
 	});
 
@@ -107,7 +104,17 @@ pub  async fn init_prometheus(mut prometheus_addr: SocketAddr){
 		.serve(service)
     .boxed();
   
+  
+	let result = _server.await.map_err(Into::into);
+
+	result
 }
+
+#[cfg(target_os = "unknown")]
+pub async fn init_prometheus(_: SocketAddr) -> Result<(), Error> {
+	Ok(())
+}
+
 
 #[macro_export]
 macro_rules! prometheus_gauge(

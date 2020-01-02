@@ -76,7 +76,7 @@ pub struct Configuration<C, G, E = NoExtension> {
 	/// Grafana data source http port. `None` if disabled.
 	pub grafana_port: Option<SocketAddr>,
 	/// Promteheus IP addr. `None` if disabled. and defult port 33333
-	pub prometheus_endpoint: Option<SocketAddr>,
+	pub prometheus_port: Option<SocketAddr>,
 	/// Telemetry service URL. `None` if disabled.
 	pub telemetry_endpoints: Option<TelemetryEndpoints>,
 	/// External WASM transport for the telemetry. If `Some`, when connection to a telemetry
@@ -155,7 +155,7 @@ impl<C, G, E> Configuration<C, G, E> where
 			rpc_ws: None,
 			rpc_ws_max_connections: None,
 			rpc_cors: Some(vec![]),
-			prometheus_endpoint: None,
+			prometheus_port: None,
 			grafana_port: None,
 			telemetry_endpoints: None,
 			telemetry_external_transport: None,
