@@ -57,7 +57,6 @@ parity-multiaddr = { package = "parity-multiaddr", version = "0.5.0" }
 prometheus-endpoint = { path = "../../utils/prometheus" }
 sc-tracing = { version = "2.0.0", path = "../tracing" }
 tracing = "0.1.10"
-sc-prometheus = { package = "sc-prometheus", path="../../utils/prometheus"}
 
 [dev-dependencies]
 substrate-test-runtime-client = { version = "2.0.0", path = "../../test-utils/runtime/client" }

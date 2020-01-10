@@ -1897,6 +1897,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b2d17dbd803c2fc86cb1b613adf63192046a7176f383a8302594654752c4c4a"
 dependencies = [
+<<<<<<< HEAD
  "futures-channel",
  "futures-core",
  "js-sys",
@@ -1913,6 +1914,11 @@ dependencies = [
  "log 0.4.8",
  "plain",
  "scroll",
+=======
+ "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "plain 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "scroll 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
+>>>>>>> 0b15bc40d... Replace grafana and tidy
 ]
 
 [[package]]
@@ -5692,6 +5698,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "prometheus-endpoint"
+version = "2.0.0"
+dependencies = [
+ "async-std 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "derive_more 0.99.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures-util 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hyper 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "prometheus 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-runtime 2.0.0",
+ "tokio 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "prost"
 version = "0.5.0"
 >>>>>>> 82cd8cf54... no-std or warm compatibility issues, grapana-data -source code reference and correction,applicable
@@ -6516,7 +6537,6 @@ dependencies = [
  "rpassword 4.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "sc-client-api 2.0.0",
  "sc-network 0.8.0",
- "sc-prometheus 2.0.0",
  "sc-service 2.0.0",
  "sc-telemetry 2.0.0",
  "sc-tracing 2.0.0",
@@ -7236,22 +7256,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sc-prometheus"
-version = "2.0.0"
-dependencies = [
- "async-std 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "derive_more 0.99.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "futures-util 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "grafana-data-source 2.0.0",
- "hyper 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "prometheus 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 2.0.0",
- "tokio 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "sc-rpc"
 version = "2.0.0"
 dependencies = [
@@ -7438,7 +7442,6 @@ dependencies = [
  "sc-keystore 2.0.0",
  "sc-network 0.8.0",
  "sc-offchain 2.0.0",
- "sc-prometheus 2.0.0",
  "sc-rpc 2.0.0",
  "sc-rpc-server 2.0.0",
  "sc-telemetry 2.0.0",

@@ -648,12 +648,7 @@ where
 
 	config.tracing_targets = cli.tracing_targets.into();
 	config.tracing_receiver = cli.tracing_receiver.into();
-	
-	// Override prometheus
-	if cli.prometheus_external {
-			config.prometheus_port = Some(
-		parse_address(&format!("{}:{}", prometheus_interface, 33333), cli.prometheus_port)?
-	)}
+
 	// Imply forced authoring on --dev
 	config.force_authoring = cli.shared_params.dev || cli.force_authoring;
 

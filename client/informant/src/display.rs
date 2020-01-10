@@ -23,10 +23,10 @@ use sp_runtime::traits::{
 };
 use sc_service::NetworkStatus;
 use std::{convert::{TryFrom, TryInto}, fmt, time};
-use prometheus_endpoint::{create_gauge, Gauge, U64};
+use prometheus_endpoint::{create_gauge, Gauge};
 
 prometheus_endpoint::lazy_static! {
-	pub static ref SYNC_TARGET: Gauge<U64> = create_gauge(
+	pub static ref SYNC_TARGET: Gauge = create_gauge(
 		"sync_target_number",
 		"block sync target number"
 	);
@@ -79,7 +79,7 @@ impl<B: BlockT> InformantDisplay<B> {
 			(SyncState::Idle, _) => ("Idle".into(), "".into()),
 			(SyncState::Downloading, None) => (format!("Syncing{}", speed), "".into()),
 			(SyncState::Downloading, Some(n)) => {
-				SYNC_TARGET.set(n.unique_saturated_into() as u64);
+				SYNC_TARGET.set(n.unique_saturated_into() as i64);
 				(format!("Syncing{}", speed), format!(", target=#{}", n))
 			}
 		};
