@@ -133,7 +133,7 @@ pub async fn init_prometheus(_: SocketAddr) -> Result<(), Error> {
 
 #[macro_export]
 macro_rules! prometheus_gauge(
-  ($($metric:expr => $value:expr),*) => {
+  ($($metric:expr,  => $value:expr),*) => {
     use $crate::{metrics::*};
     $(
         metrics::set_gauge(&$metric, $value);

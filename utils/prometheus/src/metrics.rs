@@ -49,52 +49,52 @@ pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
 lazy_static! {
     pub static ref FINALITY_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "consensus_finality_block_height_number",
-        "block is finality HEIGHT"
+        "the block HEIGHT which the network finalized with its consensus rule"
 
     );
 
     pub static ref BEST_HEIGHT: Result<IntGauge> = try_create_int_gauge(
         "consensus_best_block_height_number",
-        "block is best HEIGHT"
+        "the best block HEIGHT that the network can predict for accepting transaction for next block"
     );
 
     pub static ref P2P_PEERS_NUM: Result<IntGauge> = try_create_int_gauge(
         "p2p_peers_number",
-        "network gosip peers number"
+        "number of connected peer nodes"
     );
 
     pub static ref TARGET_NUM: Result<IntGauge> = try_create_int_gauge(
-        "consensus_target_syn_number",
-        "block syn target number"
+        "consensus_target_number",
+        "target block number for nodes to reach consensus"
     );
 
     pub static ref TX_COUNT: Result<IntGauge> = try_create_int_gauge(
         "consensus_num_txs",
-        "Number of transactions"
+        "number of transactions"
     );
 
     pub static ref NODE_MEMORY: Result<IntGauge> = try_create_int_gauge(
         "consensus_node_memory",
-        "node memory"
+        "node's primary memory(RAM) usage"
     );
 
     pub static ref NODE_CPU: Result<IntGauge> = try_create_int_gauge(
         "consensus_node_cpu",
-        "node cpu"
+        "node's cpu load"
     );
 
     pub static ref STATE_CACHE_SIZE: Result<IntGauge> = try_create_int_gauge(
         "consensus_state_cache_size",
-        "used state cache size"
+        "node's used state cache size for consensus"
     );
 
     pub static ref P2P_NODE_DOWNLOAD: Result<IntGauge> = try_create_int_gauge(
         "p2p_peers_receive_byte_per_sec",
-        "p2p_node_download_per_sec_byte"
+        "node's downloading speed in byte per sec"
     );
 
     pub static ref P2P_NODE_UPLOAD: Result<IntGauge> = try_create_int_gauge(
         "p2p_peers_send_byte_per_sec",
-        "p2p_node_upload_per_sec_byte"
+        "node's uploading speed in byte per sec"
     );
 }
