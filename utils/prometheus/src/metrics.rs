@@ -42,12 +42,20 @@ pub fn try_create_histogram(name: &str, help: &str) -> Result<Histogram> {
     Ok(histogram)
 }
 
+/// VEC Gauge Metrics a value in injection.
+pub fn set_vecgauge(gaugevec: &Result<IntGaugeVec>, labels: &HashMap<&str, &str>, value: u64) {
+    if let Ok(gaugevec) = gaugevec {
+        gaugevec.with(&labels).set(value as i64);
+    }
+}
+
 /// Gauge Metrics a value in injection.
 pub fn set_gauge(gauge: &Result<IntGauge>, value: u64) {
     if let Ok(gauge) = gauge {
         gauge.set(value as i64);
     }
 }
+
 /// histogram Metrics a value in injection.
 pub fn set_histogram(histogram: &Result<Histogram>, value: f64) {
     if let Ok(histogram) = histogram {
