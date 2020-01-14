@@ -21,16 +21,23 @@ use prometheus::{Encoder, Opts, TextEncoder, core::Atomic};
 use std::net::SocketAddr;
 #[cfg(not(target_os = "unknown"))]
 mod networking;
+pub mod expansion;
 
-pub use prometheus::{
-	Registry, Error as PrometheusError,
-	core::{GenericGauge as Gauge, AtomicF64 as F64, AtomicI64 as I64, AtomicU64 as U64}
+pub use prometheus::core::{
+	GenericGaugeVec as GaugeVec, GenericGauge as Gauge, AtomicF64 as F64, AtomicI64 as I64, AtomicU64 as U64
 };
 
-pub fn create_gauge<T: Atomic + 'static>(name: &str, description: &str, registry: &Registry) -> Result<Gauge<T>, PrometheusError> {
-	let gauge = Gauge::with_opts(Opts::new(name, description))?;
-	registry.register(Box::new(gauge.clone()))?;
-	Ok(gauge)
+pub fn create_gaugevec<T: Atomic + 'static>(name: &str, description: &str, tag: &[&str]) -> GaugeVec<T> {
+    let opts = Opts::new(name, description);
+    let gaugevec = GaugeVec::new(opts, tag).expect("Creating GaugeVec Failed");
+    prometheus::register(Box::new(gaugevec.clone())).expect("Registering gaugeVec failed");
+    gaugevec
+}
+
+pub fn create_gauge<T: Atomic + 'static>(name: &str, description: &str) -> Gauge<T> {
+	let opts = Opts::new(name, description);
+	let gauge = Gauge::with_opts(opts).expect("Creating Gauge Failed");
+	gauge
 }
 
 #[derive(Debug, derive_more::Display, derive_more::From)]

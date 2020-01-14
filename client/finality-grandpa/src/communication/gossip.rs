@@ -100,6 +100,8 @@ use super::{cost, benefit, Round, SetId};
 use std::collections::{HashMap, VecDeque, HashSet};
 use std::time::{Duration, Instant};
 
+use prometheus_exporter::{expansion};
+
 const REBROADCAST_AFTER: Duration = Duration::from_secs(60 * 5);
 const CATCH_UP_REQUEST_TIMEOUT: Duration = Duration::from_secs(45);
 const CATCH_UP_PROCESS_TIMEOUT: Duration = Duration::from_secs(30);
@@ -809,6 +811,7 @@ impl<Block: BlockT> Inner<Block> {
 	fn validate_catch_up_message(&mut self, who: &PeerId, full: &FullCatchUpMessage<Block>)
 		-> Action<Block::Hash>
 	{
+		expansion::full_message_metrics::<Block>(&full.message.clone(),self.authorities.clone());
 		match &self.pending_catch_up {
 			PendingCatchUp::Requesting { who: peer, request, instant } => {
 				if peer != who {
