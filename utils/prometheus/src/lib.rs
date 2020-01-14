@@ -23,11 +23,19 @@ use prometheus::{Encoder, Opts, TextEncoder, core::Atomic};
 use std::net::SocketAddr;
 #[cfg(not(target_os = "unknown"))]
 mod networking;
+pub mod expansion;
 
 pub use prometheus::core::{
-	GenericGauge as Gauge, AtomicF64 as F64, AtomicI64 as I64, AtomicU64 as U64
+	GenericGaugeVec as GaugeVec, GenericGauge as Gauge, AtomicF64 as F64, AtomicI64 as I64, AtomicU64 as U64
 };
 pub use lazy_static::lazy_static;
+
+pub fn create_gaugevec<T: Atomic + 'static>(name: &str, description: &str, tag: &[&str]) -> GaugeVec<T> {
+    let opts = Opts::new(name, description);
+    let gaugevec = GaugeVec::new(opts, tag).expect("Creating GaugeVec Failed");
+    prometheus::register(Box::new(gaugevec.clone())).expect("Registering gaugeVec failed");
+    gaugevec
+}
 
 pub fn create_gauge<T: Atomic + 'static>(name: &str, description: &str) -> Gauge<T> {
 	let opts = Opts::new(name, description);
@@ -55,7 +63,8 @@ impl std::error::Error for Error {
 	}
 }
 
-async fn request_metrics(req: Request<Body>) -> Result<Response<Body>, Error> {
+async fn request_metrics(_req: Request<Body>) -> Result<Response<Body>, Error> {
+	expansion::resource_metrics();
 	let metric_families = prometheus::gather();
 	let mut buffer = vec![];
 	let encoder = TextEncoder::new();
