@@ -57,36 +57,36 @@ use prometheus_endpoint::{create_gauge, Gauge, U64, F64};
 
 prometheus_endpoint::lazy_static! {
 	pub static ref FINALITY_HEIGHT: Gauge<U64> = create_gauge(
-		"consensus_finality_block_height_number",
-		"block is finality HEIGHT"
+		"substrate_finality_block_height_number",
+		"Height of the highest finalized block"
 	);
 	pub static ref BEST_HEIGHT: Gauge<U64> = create_gauge(
-		"consensus_best_block_height_number",
-		"block is best HEIGHT"
+		"substrate_best_block_height_number",
+		"Height of the highest block"
 	);
-	pub static ref P2P_PEERS_NUM: Gauge<U64> = create_gauge(
-		"p2p_peers_number",
-		"network gosip peers number"
+	pub static ref PEERS_NUM: Gauge<U64> = create_gauge(
+		"substrate_peers_count",
+		"Number of network gossip peers"
 	);
 	pub static ref TX_COUNT: Gauge<U64> = create_gauge(
-		"consensus_num_txs",
+		"substrate_transaction_count",
 		"Number of transactions"
 	);
 	pub static ref NODE_MEMORY: Gauge<U64> = create_gauge(
-		"consensus_node_memory",
-		"node memory"
+		"substrate_memory_usage",
+		"Node memory usage"
 	);
 	pub static ref NODE_CPU: Gauge<F64> = create_gauge(
-		"consensus_node_cpu",
-		"node cpu"
+		"substrate_cpu_usage",
+		"Node CPU usage"
 	);
-	pub static ref P2P_NODE_DOWNLOAD: Gauge<U64> = create_gauge(
-		"p2p_peers_receive_byte_per_sec",
-		"p2p_node_download_per_sec_byte"
+	pub static ref NODE_DOWNLOAD: Gauge<U64> = create_gauge(
+		"substrate_receive_byte_per_sec",
+		"Received bytes per second"
 	);
-	pub static ref P2P_NODE_UPLOAD: Gauge<U64> = create_gauge(
-		"p2p_peers_send_byte_per_sec",
-		"p2p_node_upload_per_sec_byte"
+	pub static ref NODE_UPLOAD: Gauge<U64> = create_gauge(
+		"substrate_sent_byte_per_sec",
+		"Sent bytes per second"
 	);
 }
 /// Aggregator for the components required to build a service.
@@ -1032,12 +1032,13 @@ ServiceBuilder<
 			TX_COUNT.set(txpool_status.ready as u64);
 			FINALITY_HEIGHT.set(finalized_number);
 			BEST_HEIGHT.set(best_number);
-			P2P_PEERS_NUM.set(num_peers as u64);
-			P2P_NODE_DOWNLOAD.set(net_status.average_download_per_sec);
-			P2P_NODE_UPLOAD.set(net_status.average_upload_per_sec);
-			Ok(())
-		}).select(exit.clone().map(Ok).compat()).then(|_| Ok(()));
-		let _ = to_spawn_tx.unbounded_send(Box::new(tel_task));
+			PEERS_NUM.set(num_peers as u64);
+			NODE_DOWNLOAD.set(net_status.average_download_per_sec);
+			NODE_UPLOAD.set(net_status.average_upload_per_sec);
+
+			ready(())
+		});
+		let _ = to_spawn_tx.unbounded_send(Box::pin(select(tel_task, exit.clone()).map(drop)));
 
 		// Periodically send the network state to the telemetry.
 		let (netstat_tx, netstat_rx) = mpsc::unbounded::<(NetworkStatus<_>, NetworkState)>();
