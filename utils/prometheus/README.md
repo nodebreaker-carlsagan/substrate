@@ -25,7 +25,7 @@ Then edit `prometheus.yml` and add `jobs` :
 ```yaml
       - job_name: kusama
           static_configs:
-          - targets: ['localhost:9955']
+          - targets: ['localhost:9615']
             labels:
               instance: local-validator
 ```
