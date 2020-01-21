@@ -4510,7 +4510,7 @@ dependencies = [
  "sp-core 2.0.0",
  "sp-finality-grandpa 2.0.0",
  "sp-runtime 2.0.0",
- "sysinfo 0.10.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sysinfo 0.10.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -7113,7 +7113,7 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.10.4"
+version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cfg-if 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -8777,7 +8777,7 @@ dependencies = [
 "checksum syn 1.0.11 (registry+https://github.com/rust-lang/crates.io-index)" = "dff0acdb207ae2fe6d5976617f887eb1e35a2ba52c13c7234c790960cdad9238"
 "checksum syn-mid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "9fd3937748a7eccff61ba5b90af1a20dbf610858923a9192ea0ecb0cb77db1d0"
 "checksum synstructure 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)" = "67656ea1dc1b41b1451851562ea232ec2e5a80242139f7e679ceccfb5d61f545"
-"checksum sysinfo 0.10.4 (registry+https://github.com/rust-lang/crates.io-index)" = "99474859bbf2710ae8f09912a047cfe24d2c1076af9eb86661eb906ca7d1e994"
+"checksum sysinfo 0.10.5 (registry+https://github.com/rust-lang/crates.io-index)" = "b8834e42be61ae4f6338b216fbb69837c7f33c3d4d3a139fb073735b25af4d9e"
 "checksum sysinfo 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)" = "6f4b2468c629cffba39c0a4425849ab3cdb03d9dfacba69684609aea04d08ff9"
 "checksum take_mut 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "f764005d11ee5f36500a149ace24e00e3da98b0158b3e2d53a7495660d3f4d60"
 "checksum target-lexicon 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6f4c118a7a38378f305a9e111fcb2f7f838c0be324bfb31a77ea04f7f6e684b4"

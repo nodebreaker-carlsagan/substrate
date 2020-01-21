@@ -30,7 +30,7 @@ pub use prometheus::core::{
 pub fn create_gaugevec<T: Atomic + 'static>(name: &str, description: &str, tag: &[&str]) -> GaugeVec<T> {
     let opts = Opts::new(name, description);
     let gaugevec = GaugeVec::new(opts, tag).expect("Creating GaugeVec Failed");
-    prometheus::register(Box::new(gaugevec.clone())).expect("Registering gaugeVec failed");
+    //prometheus::register(Box::new(gaugevec.clone())).expect("Registering gaugeVec failed");
     gaugevec
 }
 
@@ -64,6 +64,7 @@ impl std::error::Error for Error {
 }
 
 async fn request_metrics(registry: Registry) -> Result<Response<Body>, Error> {
+	expansion::resource_metrics();
 	let metric_families = registry.gather();
 	let mut buffer = vec![];
 	let encoder = TextEncoder::new();
