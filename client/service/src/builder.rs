@@ -51,7 +51,7 @@ use sysinfo::{get_current_pid, ProcessExt, System, SystemExt};
 use sc_telemetry::{telemetry, SUBSTRATE_INFO};
 use sp_transaction_pool::{TransactionPool, TransactionPoolMaintainer};
 use sp_blockchain;
-use prometheus_exporter::{create_gauge, Gauge, U64, F64, Registry};
+use prometheus_exporter::{create_gauge, Gauge, U64, F64, Registry, expansion};
 
 prometheus_exporter::lazy_static! {
 	pub static ref FINALITY_HEIGHT: Gauge<U64> = create_gauge(
@@ -1188,7 +1188,14 @@ ServiceBuilder<
 				Some(registry) => registry,
 				None => Registry::new_custom(Some("substrate".into()), None)?
 			};
-
+			registry.register(Box::new(expansion::VALIDATOR_SIGN_PREVOTE.clone()))?;
+			registry.register(Box::new(expansion::VALIDATOR_SIGN_PRECOMMIT.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_RECEIVE_BYTES.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_SENT_BYTES.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_CPU_USE.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_RAM_USE.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_SWAP_USE.clone()))?;
+			registry.register(Box::new(expansion::RESOURCE_DISK_USE.clone()))?;
 			registry.register(Box::new(NODE_MEMORY.clone()))?;
 			registry.register(Box::new(NODE_CPU.clone()))?;
 			registry.register(Box::new(TX_COUNT.clone()))?;
