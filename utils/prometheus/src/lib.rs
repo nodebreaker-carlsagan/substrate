@@ -14,13 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Substrate.  If not, see <http://www.gnu.org/licenses/>.
 
-use futures_util::{FutureExt, future::Future};
-use hyper::http::StatusCode;
-use hyper::{Server, Body, Response, service::{service_fn, make_service_fn}};
+use futures::{channel::mpsc, prelude::*};
+use hyper::{Body, http::StatusCode, Response, Server, service::{service_fn, make_service_fn}};
 use prometheus::{Encoder, Opts, TextEncoder, core::Atomic};
-use std::net::SocketAddr;
-#[cfg(not(target_os = "unknown"))]
-mod networking;
+use std::{net::SocketAddr, pin::Pin};
 
 pub use prometheus::{
 	Registry, Error as PrometheusError,
@@ -70,29 +67,28 @@ async fn request_metrics(registry: Registry) -> Result<Response<Body>, Error> {
 }
 
 #[derive(Clone)]
-pub struct Executor;
+pub struct Executor {
+	to_spawn_tx: mpsc::UnboundedSender<Pin<Box<dyn Future<Output = ()> + Send>>>,
+}
 
 #[cfg(not(target_os = "unknown"))]
 impl<T> hyper::rt::Executor<T> for Executor
-	where
-		T: Future + Send + 'static,
-		T::Output: Send + 'static,
+where
+	T: Future + Send + 'static,
 {
-	fn execute(&self, future: T) {
-		async_std::task::spawn(future);
+	fn execute(&self, fut: T) {
+		self.to_spawn_tx.unbounded_send(Box::pin(fut.map(drop)))
+			.expect("sending on unbounded channel never fails; qed");
 	}
 }
 /// Initializes the metrics context, and starts an HTTP server
 /// to serve metrics.
 #[cfg(not(target_os = "unknown"))]
-pub async fn init_prometheus(prometheus_addr: SocketAddr, registry: Registry) -> Result<(), Error>{
-	use networking::Incoming;
-	let listener = async_std::net::TcpListener::bind(&prometheus_addr)
-		.await
-		.map_err(|_| Error::PortInUse(prometheus_addr))?;
-
-	log::info!("Prometheus server started at {}", prometheus_addr);
-
+pub async fn init_prometheus(
+	prometheus_addr: SocketAddr,
+	registry: Registry,
+	to_spawn_tx: mpsc::UnboundedSender<Pin<Box<dyn Future<Output = ()> + Send>>>,
+) -> Result<(), Error>{
 	let service = make_service_fn(move |_| {
 		let registry = registry.clone();
 
@@ -103,14 +99,16 @@ pub async fn init_prometheus(prometheus_addr: SocketAddr, registry: Registry) ->
 		}
 	});
 
-	let server = Server::builder(Incoming(listener.incoming()))
-		.executor(Executor)
+	let executor = Executor { to_spawn_tx };
+
+	let server = hyper::server::Server::try_bind(&prometheus_addr)?
+		.executor(executor)
 		.serve(service)
 		.boxed();
 
-	let result = server.await.map_err(Into::into);
+	log::info!("Prometheus metrics served at {}/metrics", prometheus_addr);
 
-	result
+	server.await.map_err(Into::into)
 }
 
 #[cfg(target_os = "unknown")]

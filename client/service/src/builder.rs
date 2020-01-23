@@ -1029,7 +1029,7 @@ ServiceBuilder<
 			let metrics = ServiceMetrics::register(&registry)?;
 
 			let future = select(
-				prometheus_exporter::init_prometheus(port, registry).boxed(),
+				prometheus_exporter::init_prometheus(port, registry, to_spawn_tx.clone()).boxed(),
 				exit.clone()
 			).map(drop);
 
