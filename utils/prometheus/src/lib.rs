@@ -34,6 +34,13 @@ pub fn create_gaugevec<T: Atomic + 'static>(name: &str, description: &str, tag: 
     gaugevec
 }
 
+pub fn create_gaugevec<T: Atomic + 'static>(name: &str, description: &str, tag: &[&str]) -> GaugeVec<T> {
+    let opts = Opts::new(name, description);
+    let gaugevec = GaugeVec::new(opts, tag).expect("Creating GaugeVec Failed");
+    //prometheus::register(Box::new(gaugevec.clone())).expect("Registering gaugeVec failed");
+    gaugevec
+}
+
 pub fn create_gauge<T: Atomic + 'static>(name: &str, description: &str) -> Gauge<T> {
 	let opts = Opts::new(name, description);
 	let gauge = Gauge::with_opts(opts).expect("Creating Gauge Failed");
