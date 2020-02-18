@@ -1041,7 +1041,10 @@ ServiceBuilder<
 				exit.clone()
 			).map(drop);
 
-			let _ = to_spawn_tx.unbounded_send(Box::pin(future));
+			let _ = to_spawn_tx.unbounded_send((
+				Box::pin(future),
+				From::from("prometheus-endpoint")
+			));
 
 			Some(metrics)
 		} else {
