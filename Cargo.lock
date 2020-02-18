@@ -601,7 +601,6 @@ dependencies = [
  "js-sys",
  "num-integer",
  "num-traits",
- "serde",
  "time",
  "wasm-bindgen",
 ]
@@ -1916,34 +1915,6 @@ dependencies = [
  "log 0.4.8",
  "plain",
  "scroll",
-]
-
-[[package]]
-name = "grafana-data-source"
-version = "0.8.0"
-dependencies = [
- "async-std",
- "chrono",
- "derive_more",
- "futures-timer 3.0.1",
- "futures-util",
- "hyper 0.13.2",
- "lazy_static",
- "log 0.4.8",
- "parking_lot 0.10.0",
- "serde",
- "serde_json",
- "tokio 0.2.11",
-]
-
-[[package]]
-name = "grafana-data-source-test"
-version = "2.0.0"
-dependencies = [
- "futures 0.3.4",
- "futures-timer 3.0.1",
- "grafana-data-source",
- "rand 0.7.3",
 ]
 
 [[package]]
@@ -4959,6 +4930,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "prometheus"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5567486d5778e2c6455b1b90ff1c558f29e751fc018130fa182e15828e728af1"
+dependencies = [
+ "cfg-if",
+ "fnv",
+ "lazy_static",
+ "protobuf",
+ "quick-error",
+ "spin",
+]
+
+[[package]]
+name = "prometheus-exporter"
+version = "0.8.0"
+dependencies = [
+ "async-std",
+ "derive_more",
+ "futures-util",
+ "hyper 0.13.2",
+ "log 0.4.8",
+ "prometheus",
+ "tokio 0.2.11",
+]
+
+[[package]]
 name = "prost"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5008,6 +5006,12 @@ dependencies = [
  "bytes 0.5.4",
  "prost",
 ]
+
+[[package]]
+name = "protobuf"
+version = "2.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6686ddd96a8dbe2687b5f2a687b2cfb520854010ec480f2d74c32e7c9873d3c5"
 
 [[package]]
 name = "pwasm-utils"
@@ -5608,6 +5612,7 @@ dependencies = [
  "log 0.4.8",
  "names",
  "parity-util-mem",
+ "prometheus-exporter",
  "regex",
  "rpassword",
  "sc-client-api",
@@ -6305,13 +6310,13 @@ dependencies = [
  "futures 0.3.4",
  "futures-diagnose",
  "futures-timer 3.0.1",
- "grafana-data-source",
  "lazy_static",
  "log 0.4.8",
  "parity-multiaddr",
  "parity-scale-codec",
  "parity-util-mem",
  "parking_lot 0.10.0",
+ "prometheus-exporter",
  "sc-chain-spec",
  "sc-client",
  "sc-client-api",
@@ -6406,7 +6411,6 @@ name = "sc-tracing"
 version = "2.0.0"
 dependencies = [
  "erased-serde",
- "grafana-data-source",
  "log 0.4.8",
  "parking_lot 0.10.0",
  "sc-telemetry",
