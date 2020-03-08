@@ -87,6 +87,14 @@ impl ServiceMetrics {
 				Opts::new("network_per_sec_bytes", "Networking bytes per second"),
 				&["direction"]
 			)?, registry)?,
+			validator_block_sign_prevote: register(GaugeVec::new(
+				Opts::new("validator_block_sign_prevote", "block is validator prevote sign"),
+				&["validator_address"]
+			)?, registry)?,
+			validator_block_sign_precommit: register(GaugeVec::new(
+				Opts::new("validator_block_sign_precommit", "block is validator precommit sign"),
+				&["validator_address"]
+			)?, registry)?,
 		})
 	}
 }
