@@ -83,6 +83,7 @@
 //! We only send polite messages to peers,
 
 use sp_runtime::traits::{NumberFor, Block as BlockT, Zero};
+use sp_core::crypto::Ss58Codec;
 use sc_network_gossip::{MessageIntent, ValidatorContext};
 use sc_network::{config::Roles, PeerId, ReputationChange};
 use parity_scale_codec::{Encode, Decode};
@@ -91,7 +92,7 @@ use sp_finality_grandpa::AuthorityId;
 use sc_telemetry::{telemetry, CONSENSUS_DEBUG};
 use log::{trace, debug};
 use futures::channel::mpsc;
-use prometheus_endpoint::{CounterVec, Opts, PrometheusError, register, Registry, U64};
+use prometheus_endpoint::{GaugeVec ,CounterVec, Opts, PrometheusError, register, Registry, U64};
 use rand::seq::SliceRandom;
 
 use crate::{environment, CatchUp, CompactCommit, SignedMessage};
@@ -649,12 +650,21 @@ struct Inner<Block: BlockT> {
 	next_rebroadcast: Instant,
 	pending_catch_up: PendingCatchUp,
 	catch_up_config: CatchUpConfig,
+	metrics: Option<Metrics>,
 }
 
 type MaybeMessage<Block> = Option<(Vec<PeerId>, NeighborPacket<NumberFor<Block>>)>;
 
 impl<Block: BlockT> Inner<Block> {
-	fn new(config: crate::Config) -> Self {
+	fn new(config: crate::Config, prometheus_registry: Option<&Registry>) -> Self {
+		let metrics = match prometheus_registry.map(Metrics::register) {
+			Some(Ok(metrics)) => Some(metrics),
+			Some(Err(e)) => {
+				debug!(target: "afg", "Failed to register metrics: {:?}", e);
+				None
+			},
+			None => None,
+		};
 		let catch_up_config = if config.observer_enabled {
 			if config.is_authority {
 				// since the observer protocol is enabled, we will only issue
@@ -682,6 +692,7 @@ impl<Block: BlockT> Inner<Block> {
 			pending_catch_up: PendingCatchUp::None,
 			catch_up_config,
 			config,
+			metrics: metrics,
 		}
 	}
 
@@ -842,7 +853,34 @@ impl<Block: BlockT> Inner<Block> {
 
 	fn validate_catch_up_message(&mut self, who: &PeerId, full: &FullCatchUpMessage<Block>)
 		-> Action<Block::Hash>
-	{
+	{ 
+		if let Some(metrics) = &self.metrics {
+			let authorityid_list = self.authorities.iter();
+			for authorityid in authorityid_list {
+				let mut labels = std::collections::HashMap::new();
+				let mut _authorityid = &authorityid.clone().to_ss58check();
+				labels.insert("validator_address", _authorityid as &str);
+				metrics.messages_sign_prevote.with(&labels).set(0);
+				metrics.messages_sign_precommit.with(&labels).set(0);
+			}
+			
+			let prevote_list = full.message.prevotes.iter();
+			for prevoteid in prevote_list {
+				let mut labels = std::collections::HashMap::new();
+				let mut _prevoteid = &prevoteid.id.clone().to_ss58check();
+				labels.insert("validator_address", _prevoteid as &str);
+				metrics.messages_sign_prevote.with(&labels).set(1);
+			}
+
+			let precommit_list = full.message.precommits.iter();
+			for precommitid in precommit_list {
+				let mut labels = std::collections::HashMap::new();
+				let mut _precommitid = &precommitid.id.clone().to_ss58check();
+				labels.insert("validator_address", _precommitid as &str);
+				metrics.messages_sign_precommit.with(&labels).set(1);
+			}
+		}
+
 		match &self.pending_catch_up {
 			PendingCatchUp::Requesting { who: peer, request, instant } => {
 				if peer != who {
@@ -1201,6 +1239,8 @@ impl<Block: BlockT> Inner<Block> {
 // Prometheus metrics for [`GossipValidator`].
 pub(crate) struct Metrics {
 	messages_validated: CounterVec<U64>,
+	messages_sign_prevote: GaugeVec<U64>,
+	messages_sign_precommit: GaugeVec<U64>,
 }
 
 impl Metrics {
@@ -1213,9 +1253,23 @@ impl Metrics {
 						"Number of messages validated by the finality grandpa gossip validator."
 					),
 					&["message", "action"]
-				)?,
-				registry,
-			)?,
+				)?,	registry)?,
+			messages_sign_prevote: register(
+				GaugeVec::new(
+					Opts::new(
+						"finality_grandpa_communication_gossip_validator_messages_sign_prevote",
+						"Prevote sign list by the finality grandpa gossip validator"
+					),
+					&["validator_address"]
+				)?, registry)?,
+			messages_sign_precommit: register(
+				GaugeVec::new(
+					Opts::new(
+						"finality_grandpa_communication_gossip_validator_messages_sign_precommit",
+						"precommit sign list by the finality grandpa gossip validator"
+					),
+					&["validator_address"]
+				)?, registry)?,
 		})
 	}
 }
@@ -1248,7 +1302,7 @@ impl<Block: BlockT> GossipValidator<Block> {
 
 		let (tx, rx) = mpsc::unbounded();
 		let val = GossipValidator {
-			inner: parking_lot::RwLock::new(Inner::new(config)),
+			inner: parking_lot::RwLock::new(Inner::new(config,None)),
 			set_state,
 			report_sender: tx,
 			metrics: metrics,
@@ -1316,7 +1370,7 @@ impl<Block: BlockT> GossipValidator<Block> {
 
 		// Message name for Prometheus metric recording.
 		let message_name;
-
+		
 		let action = {
 			match GossipMessage::<Block>::decode(&mut data) {
 				Ok(GossipMessage::Vote(ref message)) => {
