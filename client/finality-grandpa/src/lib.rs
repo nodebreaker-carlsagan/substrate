@@ -630,7 +630,7 @@ pub fn run_grandpa_voter<Block: BlockT, BE: 'static, C, N, SC, VR>(
 	// API, I felt it is easier to just ignore this field rather than removing
 	// it from the config temporarily. This should be removed after #5013 is
 	// fixed and we re-add the observer to the public API.
-	config.observer_enabled = false;
+	config.observer_enabled = true;
 
 	let LinkHalf {
 		client,

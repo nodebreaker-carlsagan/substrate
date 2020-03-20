@@ -140,7 +140,7 @@ pub fn new_full(config: Configuration)
 		gossip_duration: Duration::from_millis(333),
 		justification_period: 512,
 		name: Some(name),
-		observer_enabled: false,
+		observer_enabled: true,
 		keystore,
 		is_authority,
 	};

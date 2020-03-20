@@ -212,7 +212,7 @@ macro_rules! new_full {
 			gossip_duration: std::time::Duration::from_millis(333),
 			justification_period: 512,
 			name: Some(name),
-			observer_enabled: false,
+			observer_enabled: true,
 			keystore,
 			is_authority,
 		};
